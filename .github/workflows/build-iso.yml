@@ -70,16 +70,16 @@ jobs:
           # link count climbs past ext4's 65000 / btrfs's 65535 limit, killing
           # the build with "processing tar file(too many links): exit status 1".
           # With dedup disabled each layer is materialized as ordinary copies.
-          sudo tee /etc/containers/storage.conf >/dev/null <<'EOF'
-[storage]
-driver = "overlay"
-[storage.options]
-# materialize files instead of hard-linking them against identical files that
-# already exist in storage (string bool, cannot be a plain TOML boolean)
-use_hard_links = "false"
-[storage.options.pull_options]
-use_hard_links = "false"
-EOF
+          # `use_hard_links = "false"` must be a string bool (not a TOML bool),
+          # or containers/storage will fall back to hardlink-deduplicating
+          # identical files across layers and hit the inode link limit again.
+          sudo printf '%s\n' \
+            '[storage]' \
+            'driver = "overlay"' \
+            '[storage.options]' \
+            'use_hard_links = "false"' \
+            '[storage.options.pull_options]' \
+            'use_hard_links = "false"' > /etc/containers/storage.conf
           sudo systemctl start podman.service
 
       - name: Checkout Repo
