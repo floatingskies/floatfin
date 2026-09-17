@@ -9,7 +9,7 @@ set -exo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE_IMAGE=${BASE_IMAGE:?}
 INSTALL_IMAGE_PAYLOAD=${INSTALL_IMAGE_PAYLOAD:?}
-ISO_LABEL=${ISO_LABEL:-Sharkfin-Live}
+ISO_LABEL=${ISO_LABEL:-Ublue-Float-Live}
 
 # Create the directory that /root is symlinked to
 mkdir -p "$(realpath /root)"
@@ -25,6 +25,15 @@ if mountpoint -q /usr/lib/containers/storage; then
 else
     podman pull "$INSTALL_IMAGE_PAYLOAD"
 fi
+
+# The payload image is pre-loaded into container storage so Anaconda can
+# install offline via --transport=containers-storage, which reads the
+# expanded layer diffs. The compressed layer blobs are only needed for
+# push/save, and keeping them would store every layer twice inside the ISO's
+# squashfs (where zstd:19 can't shrink them further). Drop them here to cut
+# several GB off the final ISO. Keep the small manifest/config blobs.
+blobs_dir="$(podman info --format '{{.Store.GraphRoot}}' 2>/dev/null)/blobs/sha256"
+[[ -d "$blobs_dir" ]] && find "$blobs_dir" -type f -size +1M -delete 2>/dev/null || true
 
 # Export the payload reference so the hooks don't need to guess it from podman.
 PAYLOAD_REF="${INSTALL_IMAGE_PAYLOAD#*://}"
@@ -137,10 +146,10 @@ label: "$ISO_LABEL"
 grub2:
   timeout: 3
   entries:
-    - name: "Launch Sharkfin Installer"
+    - name: "Launch Ublue-float Installer"
       linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=$ISO_LABEL enforcing=0 rd.live.image"
       initrd: "/images/pxeboot/initrd.img"
-    - name: "Launch Sharkfin Installer (Basic Graphics Mode)"
+    - name: "Launch Ublue-float Installer (Basic Graphics Mode)"
       linux: "/images/pxeboot/vmlinuz quiet rhgb root=live:CDLABEL=$ISO_LABEL enforcing=0 rd.live.image nomodeset"
       initrd: "/images/pxeboot/initrd.img"
 EOF
