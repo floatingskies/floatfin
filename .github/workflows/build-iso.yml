@@ -8,6 +8,9 @@ on:
     - cron: "0 9 */2 * *"
   workflow_dispatch:
 
+env:
+  REPO_OWNER: ${{ github.repository_owner }}
+
 permissions: {}
 
 concurrency:
@@ -39,32 +42,17 @@ jobs:
         with:
           tool-cache: true
 
-      - name: Mount Container Storage Loopback
+      - name: Mount Container Storage BTRFS Loopback
         run: |
-          sudo truncate -s 120G /mnt/podman-storage.img
-          sudo mkfs.ext4 -F -E nodiscard /mnt/podman-storage.img
+          sudo truncate -s 110G /mnt/podman-storage.img
+          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
           LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
           sudo mkdir -p /mnt/podman-storage
-          sudo mount -o discard,noatime "$LOOP" /mnt/podman-storage
+          sudo mount -o compress-force=zstd:2,discard=async,noatime "$LOOP" /mnt/podman-storage
           sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
-
-          sudo tee /etc/containers/storage.conf >/dev/null <<'EOF'
-          [storage]
-          driver = "overlay"
-          runroot = "/run/containers/storage"
-          graphroot = "/var/lib/containers/storage"
-
-          [storage.options]
-          use_hard_links = "false"
-          ignore_chown_errors = "true"
-
-          [storage.options.overlay]
-          use_hard_links = "false"
-          ignore_chown_errors = "true"
-          EOF
           sudo systemctl start podman.service
 
       - name: Checkout Repo
@@ -72,28 +60,28 @@ jobs:
         with:
           submodules: recursive
 
+      # The image registry name must be lower-case, but GitHub usernames can be capitalized.
       - name: Get lower-case equivalent of the repository owner's username
         id: repo_owner_case
-        run: echo "lowercase=${{ lower(github.repository_owner) }}" >> "$GITHUB_OUTPUT"
+        run: echo "lowercase=${REPO_OWNER,,}" >> "$GITHUB_OUTPUT"
 
       - name: Build Container Image
         run: |
           IMAGE="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/${{ matrix.name }}:${{ matrix.tag }}"
-          CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/ublue-iso-cache-${{ matrix.name }}-${{ matrix.tag }}-v2"
+          CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/ublue-iso-cache-${{ matrix.name }}"
           echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-          sudo env TMPDIR=/mnt/podman-storage/tmp \
-            PODMAN_USERNS=keep-id \
-            STORAGE_OPTS="overlay.use_hard_links=false" \
-            podman build \
-              --cap-add sys_admin \
-              --security-opt label=disable \
-              --cache-from "$CACHE_REPO" \
-              --cache-to "$CACHE_REPO" \
-              --build-arg BASE_IMAGE="$IMAGE" \
-              --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
-              --build-arg ISO_LABEL="${{ matrix.label }}" \
-              -t localhost/payload:latest installer/
+          # note: buildah's cache flags take a bare repository reference (no
+          # tag/digest and no BuildKit "type=registry,ref=...,mode=max" syntax),
+          # so keep each matrix row's cache in its own repo name
+          sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
+            --cap-add sys_admin \
+            --security-opt label=disable \
+            --cache-from "$CACHE_REPO" \
+            --cache-to "$CACHE_REPO" \
+            --build-arg BASE_IMAGE="$IMAGE" \
+            --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
+            --build-arg ISO_LABEL="${{ matrix.label }}" \
+            -t localhost/payload:latest installer/
 
       - name: Show disk space
         if: always()
@@ -102,6 +90,8 @@ jobs:
           sudo du -sh /mnt/podman-storage.img
 
       - name: Build ISOs
+        # Pin to the exact revamp-pr commit (7737f47) for reproducible ISO
+        # builds instead of following the moving branch.
         uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a
         id: build
         with:
