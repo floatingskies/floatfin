@@ -42,15 +42,15 @@ jobs:
         with:
           tool-cache: true
 
-      - name: Mount Container Storage BTRFS Loopback
+      - name: Mount Container Storage Loopback
         run: |
           sudo truncate -s 110G /mnt/podman-storage.img
-          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
+          sudo mkfs.ext4 -F -E nodiscard /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
           LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
           sudo mkdir -p /mnt/podman-storage
-          sudo mount -o compress-force=zstd:2,discard=async,noatime "$LOOP" /mnt/podman-storage
+          sudo mount -o discard,noatime "$LOOP" /mnt/podman-storage
           sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
 
@@ -85,9 +85,7 @@ jobs:
           IMAGE="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/${{ matrix.name }}:${{ matrix.tag }}"
           CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/ublue-iso-cache-${{ matrix.name }}"
           echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
-          # note: buildah's cache flags take a bare repository reference (no
-          # tag/digest and no BuildKit "type=registry,ref=...,mode=max" syntax),
-          # so keep each matrix row's cache in its own repo name
+
           sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
             --storage-opt overlay.use_hard_links=false \
             --cap-add sys_admin \
@@ -106,10 +104,11 @@ jobs:
           sudo du -sh /mnt/podman-storage.img
 
       - name: Build ISOs
-        # Pin to the exact revamp-pr commit (7737f47) for reproducible ISO
-        # builds instead of following the moving branch.
         uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a
         id: build
+        env:
+          CONTAINER_STORAGE_CONF: /etc/containers/storage.conf
+          STORAGE_OPTS: "overlay.use_hard_links=false"
         with:
           image-ref: localhost/payload:latest
           iso-dest: ${{ matrix.name }}-${{ matrix.tag }}-live-amd64.iso
