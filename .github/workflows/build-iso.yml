@@ -73,13 +73,13 @@ jobs:
           # `use_hard_links = "false"` must be a string bool (not a TOML bool),
           # or containers/storage will fall back to hardlink-deduplicating
           # identical files across layers and hit the inode link limit again.
-          sudo printf '%s\n' \
+          printf '%s\n' \
             '[storage]' \
             'driver = "overlay"' \
             '[storage.options]' \
             'use_hard_links = "false"' \
             '[storage.options.pull_options]' \
-            'use_hard_links = "false"' > /etc/containers/storage.conf
+            'use_hard_links = "false"' | sudo tee /etc/containers/storage.conf >/dev/null
           sudo systemctl start podman.service
 
       - name: Checkout Repo
