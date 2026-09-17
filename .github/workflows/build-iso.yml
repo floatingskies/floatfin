@@ -44,10 +44,6 @@ jobs:
 
       - name: Mount Container Storage Loopback
         run: |
-          # ext4, not btrfs. The images now bake hardlink-heavy Flatpaks, and
-          # extracting those layers onto a btrfs filesystem fails with
-          # "processing tar file(too many links)" (EMLINK) because of btrfs's
-          # per-inode hardlink limit. ext4 handles the same hardlink farms.
           sudo truncate -s 120G /mnt/podman-storage.img
           sudo mkfs.ext4 -F -E nodiscard /mnt/podman-storage.img
           sudo podman system reset --force
@@ -57,22 +53,21 @@ jobs:
           sudo mount -o discard,noatime "$LOOP" /mnt/podman-storage
           sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
-          # Don't hardlink-dedupe identical files across image layers while
-          # unpacking. The baked Flatpaks + rechunked layers contain "hardlink
-          # farms" (e.g. yum/rpm metadata files with identical content across
-          # every layer), and dedup collapses them onto a single inode whose
-          # link count climbs past ext4's 65000 / btrfs's 65535 limit, killing
-          # the build with "processing tar file(too many links): exit status 1".
-          # With dedup disabled each layer is materialized as ordinary copies.
+
+          # Configure Podman/Buildah storage driver options globally
           sudo tee /etc/containers/storage.conf >/dev/null <<'EOF'
 [storage]
 driver = "overlay"
+runroot = "/run/containers/storage"
+graphroot = "/var/lib/containers/storage"
+
 [storage.options]
-# materialize files instead of hard-linking them against identical files that
-# already exist in storage (string bool, cannot be a plain TOML boolean)
 use_hard_links = "false"
-[storage.options.pull_options]
+ignore_chown_errors = "true"
+
+[storage.options.overlay]
 use_hard_links = "false"
+ignore_chown_errors = "true"
 EOF
           sudo systemctl start podman.service
 
@@ -81,7 +76,6 @@ EOF
         with:
           submodules: recursive
 
-      # The image registry name must be lower-case, but GitHub usernames can be capitalized.
       - name: Get lower-case equivalent of the repository owner's username
         id: repo_owner_case
         run: echo "lowercase=${REPO_OWNER,,}" >> "$GITHUB_OUTPUT"
@@ -89,23 +83,22 @@ EOF
       - name: Build Container Image
         run: |
           IMAGE="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/${{ matrix.name }}:${{ matrix.tag }}"
-          # v2: fresh cache namespace. The old ublue-iso-cache-* repos carry
-          # accumulated layers that fail to unpack ("too many links"); delete
-          # them under Settings → Packages once the v2 builds succeed.
           CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/ublue-iso-cache-${{ matrix.name }}-${{ matrix.tag }}-v2"
           echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
-          # note: buildah's cache flags take a bare repository reference (no
-          # tag/digest and no BuildKit "type=registry,ref=...,mode=max" syntax),
-          # so keep each matrix row's cache in its own repo name
-          sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
-            --cap-add sys_admin \
-            --security-opt label=disable \
-            --cache-from "$CACHE_REPO" \
-            --cache-to "$CACHE_REPO" \
-            --build-arg BASE_IMAGE="$IMAGE" \
-            --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
-            --build-arg ISO_LABEL="${{ matrix.label }}" \
-            -t localhost/payload:latest installer/
+
+          # Force Podman & Buildah to materialize copies instead of creating hardlinks
+          sudo env TMPDIR=/mnt/podman-storage/tmp \
+            PODMAN_USERNS=keep-id \
+            STORAGE_OPTS="overlay.use_hard_links=false" \
+            podman build \
+              --cap-add sys_admin \
+              --security-opt label=disable \
+              --cache-from "$CACHE_REPO" \
+              --cache-to "$CACHE_REPO" \
+              --build-arg BASE_IMAGE="$IMAGE" \
+              --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
+              --build-arg ISO_LABEL="${{ matrix.label }}" \
+              -t localhost/payload:latest installer/
 
       - name: Show disk space
         if: always()
@@ -114,8 +107,6 @@ EOF
           sudo du -sh /mnt/podman-storage.img
 
       - name: Build ISOs
-        # Pin to the exact revamp-pr commit (7737f47) for reproducible ISO
-        # builds instead of following the moving branch.
         uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a
         id: build
         with:
