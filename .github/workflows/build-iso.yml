@@ -43,8 +43,8 @@ jobs:
       - name: Mount Container Storage XFS Loopback
         run: |
           sudo apt-get update && sudo apt-get install -y xfsprogs
-          # Aumentado para 150G para suportar a gravação final do blob de camada do payload sem estouro
-          sudo truncate -s 150G /mnt/podman-storage.img
+          # Aumentado para 210G para suportar imagens pesadas com Flatpaks embutidos (baked-in)
+          sudo truncate -s 210G /mnt/podman-storage.img
           sudo mkfs.xfs -f /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
