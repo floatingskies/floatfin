@@ -64,7 +64,6 @@ jobs:
           ignore_chown_errors = "true"
 
           [storage.options.overlay]
-          use_hard_links = "false"
           ignore_chown_errors = "true"
           EOF
 
@@ -87,7 +86,6 @@ jobs:
           echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
 
           sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
-            --storage-opt overlay.use_hard_links=false \
             --cap-add sys_admin \
             --security-opt label=disable \
             --cache-from "$CACHE_REPO" \
@@ -104,11 +102,12 @@ jobs:
           sudo du -sh /mnt/podman-storage.img
 
       - name: Build ISOs
+        # Pin to the exact revamp-pr commit (7737f47) for reproducible ISO
+        # builds instead of following the moving branch.
         uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a
         id: build
         env:
           CONTAINER_STORAGE_CONF: /etc/containers/storage.conf
-          STORAGE_OPTS: "overlay.use_hard_links=false"
         with:
           image-ref: localhost/payload:latest
           iso-dest: ${{ matrix.name }}-${{ matrix.tag }}-live-amd64.iso
