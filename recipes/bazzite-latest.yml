@@ -1,14 +1,13 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: sharkfin-bazzite
+name: bazzite-float
 # description will be included in the image's metadata
-description: Bazzite with my personal preferences baked in, including the GNOME desktop.  This bootable container image follows Bazzite's stable image channel.
+description: A bit opinionated distro made by Float. Bazzite DX GNOME on the latest stream.
 alt-tags:
-  - stable
-  - stable-weekly
+  - latest
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/bazzite-dx-gnome
-image-version: stable # Bazzite publishes only stream tags (no numeric 44/43)
+image-version: latest # Bazzite publishes only stream tags (no numeric 44/43)
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
@@ -30,9 +29,9 @@ modules:
   - type: script
     snippets: []
     scripts: 
-      - sharkfin-disable-steam-autostart.sh
+      - ublue-disable-steam-autostart.sh
   - type: script
     env:
-      SHARKFIN_WALLPAPER: pixel-pusher-l.jxl
+      UBLUE_WALLPAPER: pixel-pusher-l.jxl
     scripts:
       - set-default-wallpaper.sh

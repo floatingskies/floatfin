@@ -1,8 +1,8 @@
 # run with --cap-add sys_admin --security-opt label=disable
 
-ARG BASE_IMAGE=${BASE_IMAGE:-ghcr.io/arikcloss/sharkfin-bazzite:stable}
-ARG INSTALL_IMAGE_PAYLOAD=${INSTALL_IMAGE_PAYLOAD:-ghcr.io/arikcloss/sharkfin-bazzite:stable}
-ARG ISO_LABEL=${ISO_LABEL:-Sharkfin-Live}
+ARG BASE_IMAGE=${BASE_IMAGE:-ghcr.io/floatingskies/ublue-float:stable}
+ARG INSTALL_IMAGE_PAYLOAD=${INSTALL_IMAGE_PAYLOAD:-ghcr.io/floatingskies/ublue-float:stable}
+ARG ISO_LABEL=${ISO_LABEL:-Ublue-Float-Live}
 
 
 FROM $BASE_IMAGE

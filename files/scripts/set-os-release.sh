@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 set -euo pipefail
 
-# Rewrites /usr/lib/os-release so the OS identifies itself as Sharkfin
+# Rewrites /usr/lib/os-release so the OS identifies itself as ublue-float
 # everywhere: Settings -> About, the live-ISO installer branding, CPE_NAME,
 # DEFAULT_HOSTNAME and so on. The output follows the same structure Universal
 # Blue's Bluefin uses.
@@ -9,9 +9,9 @@ set -euo pipefail
 # The flavor is detected from the base image's own os-release ID, so this file
 # keeps working through base-image and Fedora version bumps with no edits:
 #
-#   base ID is bluefin  -> "Sharkfin Bluefin"
-#   base ID is bazzite  -> "Sharkfin Bazzite"
-#   anything else       -> "Sharkfin"
+#   base ID is bluefin  -> "Ublue Float Bluefin"
+#   base ID is bazzite  -> "Ublue Float Bazzite"
+#   anything else       -> "Ublue Float"
 #
 # Fields that describe the underlying OS (VERSION_ID, VERSION_CODENAME,
 # VARIANT, SUPPORT_END, ...) are preserved from the base image, which keeps
@@ -42,27 +42,27 @@ BASE_SUPPORT_END="$(get_kv SUPPORT_END)"
 
 case "$BASE_ID" in
     bluefin*)
-        IMAGE_NAME="${IMAGE_NAME:-Sharkfin Bluefin}"
-        IMAGE_ID="${IMAGE_ID:-sharkfin-bluefin}"
-        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-sharkfin-bluefin}"
+        IMAGE_NAME="${IMAGE_NAME:-Ublue Float Bluefin}"
+        IMAGE_ID="${IMAGE_ID:-ublue-float-bluefin}"
+        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-ublue-float-bluefin}"
         ;;
     bazzite*)
-        IMAGE_NAME="${IMAGE_NAME:-Sharkfin Bazzite}"
-        IMAGE_ID="${IMAGE_ID:-sharkfin-bazzite}"
-        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-sharkfin-bazzite}"
+        IMAGE_NAME="${IMAGE_NAME:-Ublue Float Bazzite}"
+        IMAGE_ID="${IMAGE_ID:-ublue-float-bazzite}"
+        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-ublue-float-bazzite}"
         ;;
     *)
-        IMAGE_NAME="${IMAGE_NAME:-Sharkfin}"
-        IMAGE_ID="${IMAGE_ID:-sharkfin}"
-        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-sharkfin}"
+        IMAGE_NAME="${IMAGE_NAME:-Ublue Float}"
+        IMAGE_ID="${IMAGE_ID:-ublue-float}"
+        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-ublue-float}"
         ;;
 esac
 
 RELEASE_TYPE="${RELEASE_TYPE:-stable}"
-IMAGE_HOME_URL="${IMAGE_HOME_URL:-https://github.com/arikcloss/sharkfin}"
-IMAGE_DOCUMENTATION_URL="${IMAGE_DOCUMENTATION_URL:-https://github.com/arikcloss/sharkfin#readme}"
-IMAGE_SUPPORT_URL="${IMAGE_SUPPORT_URL:-https://github.com/arikcloss/sharkfin/issues}"
-IMAGE_BUG_REPORT_URL="${IMAGE_BUG_REPORT_URL:-https://github.com/arikcloss/sharkfin/issues}"
+IMAGE_HOME_URL="${IMAGE_HOME_URL:-https://github.com/floatingskies/ublue-float}"
+IMAGE_DOCUMENTATION_URL="${IMAGE_DOCUMENTATION_URL:-https://github.com/floatingskies/ublue-float#readme}"
+IMAGE_SUPPORT_URL="${IMAGE_SUPPORT_URL:-https://github.com/floatingskies/ublue-float/issues}"
+IMAGE_BUG_REPORT_URL="${IMAGE_BUG_REPORT_URL:-https://github.com/floatingskies/ublue-float/issues}"
 
 # Bluefin-style build stamp: <channel>-<v>.YYYYMMDD.1
 VERSION="$RELEASE_TYPE-$BASE_VERSION_ID.$(date -u +%Y%m%d).1"

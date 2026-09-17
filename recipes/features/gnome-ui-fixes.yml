@@ -2,7 +2,7 @@
 modules:
   - type: gschema-overrides  # this sets up our dconf overrides
     include:
-      - zz1-sharkfin-fedora.gschema.override
+      - zz1-ublue-fedora.gschema.override
   - type: gnome-extensions
     install:
       - Accent Icons

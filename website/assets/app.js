@@ -1,4 +1,4 @@
-/* sharkfin — website behavior
+/* ublue-float — website behavior
    Static front-end: lists recent commits from the public GitHub API and
    links to the monthly ISO releases on Google Drive.
    No secrets, no tracking, no frameworks. All text is inserted via textContent. */
@@ -6,7 +6,7 @@
 (function () {
   "use strict";
 
-  var REPO = "floatingskies/sharkfin";
+  var REPO = "floatingskies/ublue-float";
   var API = "https://api.github.com/repos/" + REPO;
 
   // TODO: replace with the public link to your Google Drive ISO folder once
@@ -98,7 +98,7 @@
     var btn = $id("theme-toggle");
     var mq = window.matchMedia("(prefers-color-scheme: light)");
     var chosen = null;
-    try { chosen = localStorage.getItem("sharkfin-theme"); } catch (e) { /* private mode */ }
+    try { chosen = localStorage.getItem("ublue-float-theme"); } catch (e) { /* private mode */ }
 
     function apply(theme) {
       root.setAttribute("data-theme", theme);
@@ -115,7 +115,7 @@
         var next = current() === "light" ? "dark" : "light";
         chosen = next;
         apply(next);
-        try { localStorage.setItem("sharkfin-theme", next); } catch (e) { /* ignore */ }
+        try { localStorage.setItem("ublue-float-theme", next); } catch (e) { /* ignore */ }
       });
     }
     if (mq.addEventListener) {

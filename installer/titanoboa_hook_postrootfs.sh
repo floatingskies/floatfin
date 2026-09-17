@@ -18,7 +18,7 @@ mkdir -p /var/lib/rpm-state # Needed for Anaconda Web UI
 # anaconda.conf), so automatic partitioning creates standard partitions.
 # Users can still choose LVM, Btrfs, or a custom layout in the storage spoke.
 mkdir -p /etc/anaconda/conf.d
-cat >/etc/anaconda/conf.d/99-sharkfin-partitioning.conf <<EOF
+cat >/etc/anaconda/conf.d/99-ublue-partitioning.conf <<EOF
 [Storage]
 default_scheme = PLAIN
 EOF
@@ -27,7 +27,7 @@ EOF
 dnf install -qy --setopt=install_weak_deps=0 qrencode yad
 
 # Variables
-imageref="${PAYLOAD_IMAGEREF:-$(podman images --format '{{ index .Names 0 }}\n' 'sharkfin*' | head -1)}"
+imageref="${PAYLOAD_IMAGEREF:-$(podman images --format '{{ index .Names 0 }}\n' 'ublue*' | head -1)}"
 imageref="${imageref##*://}"
 imageref="${imageref%%:*}"
 imagetag="${PAYLOAD_IMAGETAG:-$(podman images --format '{{ .Tag }}\n' "$imageref" | head -1)}"
@@ -41,9 +41,9 @@ SECUREBOOT_DOC_URL_QR="/usr/share/ublue-os/secure_boot_qr.png"
 : ${VARIANT_ID:=$ID}
 
 if [[ -n "${VERSION_CODENAME:-}" ]]; then
-    echo "Sharkfin release $VERSION_ID ($VERSION_CODENAME)" >/etc/system-release
+    echo "ublue-float release $VERSION_ID ($VERSION_CODENAME)" >/etc/system-release
 else
-    echo "Sharkfin release $VERSION_ID" >/etc/system-release
+    echo "ublue-float release $VERSION_ID" >/etc/system-release
 fi
 
 # Secureboot Key Fetch
@@ -54,7 +54,7 @@ curl -Lo /usr/share/ublue-os/sb_pubkey.der "$sbkey"
 cat <<EOF >>/usr/share/anaconda/interactive-defaults.ks
 
 # Check if there is a bitlocker partition and ask the user to disable it
-%pre --erroronfail --log=/tmp/sharkfin_detect_bitlocker.log
+%pre --erroronfail --log=/tmp/ublue_detect_bitlocker.log
 DOCS_QR=/tmp/detect_bitlocker_qr.png
 IS_BITLOCKER=\$(lsblk -o FSTYPE --json | jq '.blockdevices | map(select(.fstype == "BitLocker")) | . != []')
 { WARNING_MSG="\$(</dev/stdin)"; } << 'WARNINGEOF'
@@ -95,14 +95,14 @@ rm -rf /mnt/sysroot/boot/efi/EFI/fedora
 %end
 
 # Relabel the boot partition so the rescue entry can find it
-%pre-install --erroronfail --log=/tmp/sharkfin_repartitioning.log
+%pre-install --erroronfail --log=/tmp/ublue_repartitioning.log
 set -x
 xboot_dev=\$(findmnt -o SOURCE --nofsroot --noheadings -f --target /mnt/sysroot/boot)
 if [[ -z \$xboot_dev ]]; then
   echo "ERROR: xboot_dev not found"
   exit 1
 fi
-e2label "\$xboot_dev" "sharkfin_xboot"
+e2label "\$xboot_dev" "ublue_xboot"
 %end
 
 # Open a dialog with the installation logs
@@ -118,23 +118,23 @@ run0 --user=liveuser yad \
 %end
 
 ostreecontainer --url=$imageref:$imagetag --transport=containers-storage --no-signature-verification
-%include /usr/share/anaconda/post-scripts/sharkfin-install-configure-upgrade.ks
-%include /usr/share/anaconda/post-scripts/sharkfin-secureboot-enroll-key.ks
-%include /usr/share/anaconda/post-scripts/sharkfin-secureboot-docs.ks
+%include /usr/share/anaconda/post-scripts/ublue-install-configure-upgrade.ks
+%include /usr/share/anaconda/post-scripts/ublue-secureboot-enroll-key.ks
+%include /usr/share/anaconda/post-scripts/ublue-secureboot-docs.ks
 EOF
 
 mkdir -p /usr/share/anaconda/post-scripts
 
 # Switch to the container image on disk
-cat <<EOF >/usr/share/anaconda/post-scripts/sharkfin-install-configure-upgrade.ks
-%post --erroronfail --log=/tmp/sharkfin_bootc-switch.log
+cat <<EOF >/usr/share/anaconda/post-scripts/ublue-install-configure-upgrade.ks
+%post --erroronfail --log=/tmp/ublue_bootc-switch.log
 bootc switch --mutate-in-place --enforce-container-sigpolicy --transport registry $imageref:$imagetag
 %end
 EOF
 
 # Enroll Secureboot Key
-cat <<EOF >/usr/share/anaconda/post-scripts/sharkfin-secureboot-enroll-key.ks
-%post --erroronfail --nochroot --log=/tmp/sharkfin_secureboot-enroll-key.log
+cat <<EOF >/usr/share/anaconda/post-scripts/ublue-secureboot-enroll-key.ks
+%post --erroronfail --nochroot --log=/tmp/ublue_secureboot-enroll-key.log
 set -oue pipefail
 
 readonly ENROLLMENT_PASSWORD="universalblue"
@@ -155,8 +155,8 @@ echo -e "\$ENROLLMENT_PASSWORD\n\$ENROLLMENT_PASSWORD" | mokutil --import "\$SEC
 %end
 EOF
 
-cat <<EOF >/usr/share/anaconda/post-scripts/sharkfin-secureboot-docs.ks
-%post --nochroot --log=/tmp/sharkfin_secureboot-docs.log
+cat <<EOF >/usr/share/anaconda/post-scripts/ublue-secureboot-docs.ks
+%post --nochroot --log=/tmp/ublue_secureboot-docs.log
 SECUREBOOT_KEY="$SECUREBOOT_KEY"
 SECUREBOOT_DOC_URL="$SECUREBOOT_DOC_URL"
 SECUREBOOT_DOC_URL_QR="$SECUREBOOT_DOC_URL_QR"

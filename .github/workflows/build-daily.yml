@@ -29,9 +29,9 @@ jobs:
       matrix:
         recipe:
           # !! Add your recipes here 
-          - sharkfin-latest.yml
-          - sharkfin-bluefin-latest.yml
-          - sharkfin-macintosh-latest.yml
+          - ublue-latest.yml
+          - bluefin-latest.yml
+          - bazzite-latest.yml
     steps:
        # the build is fully handled by the reusable github action
       - name: Build Custom Image

@@ -1,24 +1,24 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: sharkfin-bluefin
+name: bluefin-float
 # description will be included in the image's metadata
-description: Bluefin DX with my personal preferences baked in. This bootable container image follows Bluefin's stable image channel on Fedora 44.
+description: A bit opinionated distro made by Float. Bluefin DX on the latest stream.
 alt-tags:
-  - stable
-  - stable-weekly
+  - canary
+  - latest
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/bluefin-dx
-image-version: 44 # stable Fedora stream
+image-version: latest # latest is also supported if you want new updates ASAP
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
-  - from-file: features/sharkfin-bluefin-features.yml
+  - from-file: features/ublue-bluefin-features.yml
   - type: gschema-overrides  # Override Bluefin's overrides of Gnome default fonts
     include:
-      - zz42-sharkfin-bluefin.gschema.override
+      - zz42-ublue-bluefin.gschema.override
   - type: script
     env:
-      SHARKFIN_WALLPAPER: 5120x2880.jpg
+      UBLUE_WALLPAPER: 5120x2880.jpg
     scripts:
       - set-default-wallpaper.sh

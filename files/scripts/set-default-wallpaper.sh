@@ -5,16 +5,16 @@ set -euo pipefail
 # ISO) to a wallpaper already installed by the wallpapers feature, by writing
 # a gschema override. Users can still change it afterwards from Settings.
 # The filename to look up (under /usr/share/backgrounds) comes from the
-# SHARKFIN_WALLPAPER env var set in the recipe.
+# UBLUE_WALLPAPER env var set in the recipe.
 
-wallpaper="${SHARKFIN_WALLPAPER:?SHARKFIN_WALLPAPER env var is required}"
+wallpaper="${UBLUE_WALLPAPER:?UBLUE_WALLPAPER env var is required}"
 wall="$(find /usr/share/backgrounds -type f -iname "${wallpaper}" -print -quit 2>/dev/null || true)"
 if [[ -z "${wall}" ]]; then
     echo "error: wallpaper '${wallpaper}' not found under /usr/share/backgrounds" >&2
     exit 1
 fi
 
-override="/usr/share/glib-2.0/schemas/zz99-sharkfin-wallpaper.gschema.override"
+override="/usr/share/glib-2.0/schemas/zz99-ublue-wallpaper.gschema.override"
 {
     printf '[org.gnome.desktop.background]\n'
     printf "picture-uri='file://%s'\n" "$wall"

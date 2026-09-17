@@ -28,12 +28,8 @@ jobs:
       matrix:
         recipe:
           # !! Add your recipes here 
-          - sharkfin-gts.yml
-          - sharkfin-bluefin-stable.yml
-          - sharkfin-bluefin-gts.yml
-          - sharkfin-bazzite.yml
-          - sharkfin-macintosh-gts.yml
-          - sharkfin-macintosh-stable.yml
+          - ublue-gts.yml
+          - ublue-stable.yml
     steps:
        # the build is fully handled by the reusable github action
       - name: Build Custom Image

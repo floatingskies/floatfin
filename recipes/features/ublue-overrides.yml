@@ -2,7 +2,7 @@
 modules:
 - type: files
   files:
-    - source: dconf-sharkfin
+    - source: dconf-ublue
       destination: /etc/dconf/db/distro.d
 - type: dnf
   repos:

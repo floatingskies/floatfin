@@ -1,22 +1,20 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: sharkfin
+name: ublue-float
 # description will be included in the image's metadata
-description: A Fedora Silverblue Bootable Container image with my personal preferences and Universal Blue improvements baked in
-
+description: A bit opinionated distro made by Float
 alt-tags:
-  - latest
-  - canary
+  - stable
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/silverblue-main
-image-version: 44
+image-version: 44 # stable Fedora stream
 
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
-  - from-file: features/sharkfin-features.yml
+  - from-file: features/ublue-features.yml
   - type: script
     env:
-      SHARKFIN_WALLPAPER: 2560x1440.jpg
+      UBLUE_WALLPAPER: 2560x1440.jpg
     scripts:
       - set-default-wallpaper.sh
