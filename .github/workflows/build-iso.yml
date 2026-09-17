@@ -37,37 +37,49 @@ jobs:
             tag: latest
             label: Ublue-Bazzite-Live
     steps:
-      - name: Free Disk Space
-        uses: ublue-os/remove-unwanted-software@v8
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          # The payload embeds a full expanded copy of the install image in its
+          # own container storage, so the build needs every free GB we can get.
+          # `large-packages` + `swap-storage` reclaim the biggest chunks.
+          tool-cache: true
+          large-packages: true
+          docker-images: true
+          swap-storage: true
 
-      - name: Mount Container Storage XFS Loopback
+      - name: Mount Container Storage Loopback
         run: |
-          sudo apt-get update && sudo apt-get install -y xfsprogs
-          # Aumentado para 210G para suportar imagens pesadas com Flatpaks embutidos (baked-in)
-          sudo truncate -s 210G /mnt/podman-storage.img
-          sudo mkfs.xfs -f /mnt/podman-storage.img
+          # ext4, not btrfs. The images now bake hardlink-heavy Flatpaks, and
+          # extracting those layers onto a btrfs filesystem fails with
+          # "processing tar file(too many links)" (EMLINK) because of btrfs's
+          # per-inode hardlink limit. ext4 handles the same hardlink farms.
+          sudo truncate -s 120G /mnt/podman-storage.img
+          sudo mkfs.ext4 -F -E nodiscard /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
-
           LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
           sudo mkdir -p /mnt/podman-storage
           sudo mount -o discard,noatime "$LOOP" /mnt/podman-storage
           sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
-
+          # Don't hardlink-dedupe identical files across image layers while
+          # unpacking. The baked Flatpaks + rechunked layers contain "hardlink
+          # farms" (e.g. yum/rpm metadata files with identical content across
+          # every layer), and dedup collapses them onto a single inode whose
+          # link count climbs past ext4's 65000 / btrfs's 65535 limit, killing
+          # the build with "processing tar file(too many links): exit status 1".
+          # With dedup disabled each layer is materialized as ordinary copies.
           sudo tee /etc/containers/storage.conf >/dev/null <<'EOF'
-          [storage]
-          driver = "overlay"
-          runroot = "/run/containers/storage"
-          graphroot = "/var/lib/containers/storage"
-
-          [storage.options]
-          ignore_chown_errors = "true"
-
-          [storage.options.overlay]
-          ignore_chown_errors = "true"
-          EOF
-
+[storage]
+driver = "overlay"
+[storage.options]
+# materialize files instead of hard-linking them against identical files that
+# already exist in storage (string bool, cannot be a plain TOML boolean)
+use_hard_links = "false"
+[storage.options.pull_options]
+use_hard_links = "false"
+EOF
           sudo systemctl start podman.service
 
       - name: Checkout Repo
@@ -80,22 +92,20 @@ jobs:
         id: repo_owner_case
         run: echo "lowercase=${REPO_OWNER,,}" >> "$GITHUB_OUTPUT"
 
+      # Build the installer payload (installer/) FROM the release image. The
+      # payload embeds the install image in its own container storage so
+      # Anaconda can install offline via --transport=containers-storage.
+      # --squash, like titanoboa's own bazzite example, keeps the payload as a
+      # single flat layer. No buildah layer cache: it accumulated stale layers
+      # that failed to unpack on the runner, and dropping it keeps builds
+      # reproducible.
       - name: Build Container Image
         run: |
           IMAGE="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/${{ matrix.name }}:${{ matrix.tag }}"
-          CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/ublue-iso-cache-${{ matrix.name }}"
-          echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
-
-          # Salvaguardas de espaço antes do build
-          sudo podman system prune -a --force
-          sudo rm -rf /mnt/podman-storage/tmp/*
-          sudo mkdir -p /mnt/podman-storage/tmp
-
           sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
             --cap-add sys_admin \
             --security-opt label=disable \
-            --cache-from "$CACHE_REPO" \
-            --cache-to "$CACHE_REPO" \
+            --squash \
             --build-arg BASE_IMAGE="$IMAGE" \
             --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
             --build-arg ISO_LABEL="${{ matrix.label }}" \
@@ -108,10 +118,10 @@ jobs:
           sudo du -sh /mnt/podman-storage.img
 
       - name: Build ISOs
-        uses: ublue-os/titanoboa@main
+        # Pin to the exact revamp-pr commit (7737f47) for reproducible ISO
+        # builds instead of following the moving branch.
+        uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a
         id: build
-        env:
-          CONTAINER_STORAGE_CONF: /etc/containers/storage.conf
         with:
           image-ref: localhost/payload:latest
           iso-dest: ${{ matrix.name }}-${{ matrix.tag }}-live-amd64.iso

@@ -18,13 +18,12 @@ mkdir -p "$(realpath /root)"
 # so we need to remount it as rw
 mount -o remount,rw /proc/sys
 
-# Pull the container image to be installed
-if mountpoint -q /usr/lib/containers/storage; then
-    # We load our image from the host container storage if possible
-    podman save --format oci-archive "$INSTALL_IMAGE_PAYLOAD" | podman load --storage-opt additionalimagestore=''
-else
-    podman pull "$INSTALL_IMAGE_PAYLOAD"
-fi
+# Pull the container image to be installed. During `podman build` the RUN
+# container can't reach the host's container storage (Containerfile mounts can
+# only reference the build context), and a bind mount wouldn't persist into the
+# committed image anyway — so this always pulls into the payload's own storage,
+# exactly like titanoboa's bazzite example.
+podman pull "$INSTALL_IMAGE_PAYLOAD"
 
 # The payload image is pre-loaded into container storage so Anaconda can
 # install offline via --transport=containers-storage, which reads the

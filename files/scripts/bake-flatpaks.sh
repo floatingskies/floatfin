@@ -62,3 +62,26 @@ flatpak install --installation=image --noninteractive --assumeyes flathub \
     org.kde.krita \
     org.inkscape.Inkscape \
     org.pvermeer.WebAppHub
+
+# --- Light weight trimming (keeps every app, drops what's not needed) ---
+
+# 1. Orphaned runtimes/extensions, i.e. ones no installed app references.
+flatpak uninstall --installation=image --unused --noninteractive --assumeyes || true
+
+# 2. Locale packs: each runtime ships a per-language .Locale extension that
+#    duplicates translations/help for every available language. Removing them
+#    saves a few hundred MB with no impact on the apps themselves (they fall
+#    back to the base language).
+flatpak list --installation=image --columns=ref 2>/dev/null \
+    | grep -E '\.Locale$' \
+    | xargs -r flatpak uninstall --installation=image --noninteractive --assumeyes || true
+
+# 3. Garbage-collect the internal ostree repo so the objects freed by the
+#    uninstalls actually disappear from the layer instead of lingering as
+#    unreachable data.
+if command -v ostree >/dev/null 2>&1 && [[ -d /usr/share/flatpaks/repo ]]; then
+    ostree --repo=/usr/share/flatpaks/repo prune --refs-only || true
+fi
+
+# 4. Spent build caches.
+rm -rf /var/cache/flatpak /root/.cache/flatpak /tmp/* 2>/dev/null || true
