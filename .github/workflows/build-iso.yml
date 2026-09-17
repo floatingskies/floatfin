@@ -70,14 +70,21 @@ jobs:
           # link count climbs past ext4's 65000 / btrfs's 65535 limit, killing
           # the build with "processing tar file(too many links): exit status 1".
           # With dedup disabled each layer is materialized as ordinary copies.
-          # `use_hard_links = "false"` must be a string bool (not a TOML bool),
-          # or containers/storage will fall back to hardlink-deduplicating
-          # identical files across layers and hit the inode link limit again.
+          # containers/storage reads `use_hard_links` from the pull_options
+          # table (a string map) and from it recomputes whether to hardlink
+          # identical files across layers. Setting it directly under
+          # `[storage.options]` is NOT a recognized key (decoder warns and
+          # drops it), and runroot/graphroot must be spelled out or c/storage
+          # clears its defaults and fails with "runroot must be set".
           printf '%s\n' \
             '[storage]' \
             'driver = "overlay"' \
+            'runroot = "/run/containers/storage"' \
+            'graphroot = "/var/lib/containers/storage"' \
+            '' \
             '[storage.options]' \
-            'use_hard_links = "false"' \
+            'ignore_chown_errors = "true"' \
+            '' \
             '[storage.options.pull_options]' \
             'use_hard_links = "false"' | sudo tee /etc/containers/storage.conf >/dev/null
           sudo systemctl start podman.service
