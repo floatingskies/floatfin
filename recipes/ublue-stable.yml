@@ -15,6 +15,6 @@ modules:
   - from-file: features/ublue-features.yml
   - type: script
     env:
-      UBLUE_WALLPAPER: 2560x1440.jpg
+      UBLUE_WALLPAPER: silverblue-woof.png
     scripts:
       - set-default-wallpaper.sh

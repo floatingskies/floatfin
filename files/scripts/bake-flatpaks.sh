@@ -56,4 +56,9 @@ flatpak install --installation=image --noninteractive --assumeyes flathub \
     com.ranfdev.DistroShelf \
     sh.loft.devpod \
     me.iepure.devtoolbox \
-    io.podman_desktop.PodmanDesktop
+    io.podman_desktop.PodmanDesktop \
+    org.wireshark.Wireshark \
+    org.filezillaproject.Filezilla \
+    org.kde.krita \
+    org.inkscape.Inkscape \
+    org.pvermeer.WebAppHub

@@ -8,11 +8,15 @@ Modifications common to all images:
 
 -   Brave installed as default browser
 -   Curated selection of Flatpak apps baked into the image (this overrides Bluefin's default flatpak choices)
+-   [Web App Hub](https://github.com/pvermeer/webapp-hub) to turn your favourite sites into desktop web apps
+-   Network tools baked in as Flatpaks: Wireshark and FileZilla
+-   Creative Flatpaks: GIMP, Krita, Inkscape, darktable, Audacity, Pinta
 -   Clocks set to AM/PM view with Weekday Display
 -   Single click to open items in Nautilus
 -   Use smaller icons in Nautilus icon view
 -   Sort directories first in Nautilus and GTK file choosers
 -   Dark styles enabled by default
+-   Floating-woof wallpapers, one per edition (Silverblue, Bluefin, Bazzite), available in the GNOME wallpaper picker
 -   [System76 wallpaper collection](https://system76.com/merch/desktop-wallpapers)
 -   [Framework 12](https://frame.work/laptop12) wallpapers
 -   Historical Ubuntu wallpapers, mostly from the LTS versions

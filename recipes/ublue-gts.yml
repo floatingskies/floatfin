@@ -15,6 +15,6 @@ modules:
   - from-file: features/ublue-features.yml
   - type: script
     env:
-      UBLUE_WALLPAPER: System76-Geometric-adapted_by_Kate_Hazen_of_System76.png
+      UBLUE_WALLPAPER: silverblue-woof.png
     scripts:
       - set-default-wallpaper.sh

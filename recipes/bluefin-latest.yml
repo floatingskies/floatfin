@@ -19,6 +19,6 @@ modules:
       - zz42-ublue-bluefin.gschema.override
   - type: script
     env:
-      UBLUE_WALLPAPER: 5120x2880.jpg
+      UBLUE_WALLPAPER: bluefin-woof.png
     scripts:
       - set-default-wallpaper.sh

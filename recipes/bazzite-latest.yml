@@ -32,6 +32,6 @@ modules:
       - ublue-disable-steam-autostart.sh
   - type: script
     env:
-      UBLUE_WALLPAPER: pixel-pusher-l.jxl
+      UBLUE_WALLPAPER: bazzite-woof.png
     scripts:
       - set-default-wallpaper.sh
