@@ -74,7 +74,7 @@ jobs:
 
       - name: Get lower-case equivalent of the repository owner's username
         id: repo_owner_case
-        run: echo "lowercase=${{ toLower(github.repository_owner) }}" >> "$GITHUB_OUTPUT"
+        run: echo "lowercase=${{ lower(github.repository_owner) }}" >> "$GITHUB_OUTPUT"
 
       - name: Build Container Image
         run: |
