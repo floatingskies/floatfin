@@ -45,7 +45,7 @@ jobs:
       - name: Mount Container Storage Loopback
         run: |
           sudo truncate -s 110G /mnt/podman-storage.img
-          sudo mkfs.ext4 -F -E nodiscard /mnt/podman-storage.img
+          sudo mkfs.ext4 -F -O dir_nlink -E nodiscard /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
           LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
