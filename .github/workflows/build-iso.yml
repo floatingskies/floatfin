@@ -53,6 +53,21 @@ jobs:
           sudo mount -o compress-force=zstd:2,discard=async,noatime "$LOOP" /mnt/podman-storage
           sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
+
+          sudo tee /etc/containers/storage.conf >/dev/null <<'EOF'
+          [storage]
+          driver = "overlay"
+          runroot = "/run/containers/storage"
+          graphroot = "/var/lib/containers/storage"
+
+          [storage.options]
+          ignore_chown_errors = "true"
+
+          [storage.options.overlay]
+          use_hard_links = "false"
+          ignore_chown_errors = "true"
+          EOF
+
           sudo systemctl start podman.service
 
       - name: Checkout Repo
@@ -74,6 +89,7 @@ jobs:
           # tag/digest and no BuildKit "type=registry,ref=...,mode=max" syntax),
           # so keep each matrix row's cache in its own repo name
           sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
+            --storage-opt overlay.use_hard_links=false \
             --cap-add sys_admin \
             --security-opt label=disable \
             --cache-from "$CACHE_REPO" \
