@@ -52,19 +52,19 @@ jobs:
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
 
           sudo tee /etc/containers/storage.conf >/dev/null <<'EOF'
-[storage]
-driver = "overlay"
-runroot = "/run/containers/storage"
-graphroot = "/var/lib/containers/storage"
+          [storage]
+          driver = "overlay"
+          runroot = "/run/containers/storage"
+          graphroot = "/var/lib/containers/storage"
 
-[storage.options]
-use_hard_links = "false"
-ignore_chown_errors = "true"
+          [storage.options]
+          use_hard_links = "false"
+          ignore_chown_errors = "true"
 
-[storage.options.overlay]
-use_hard_links = "false"
-ignore_chown_errors = "true"
-EOF
+          [storage.options.overlay]
+          use_hard_links = "false"
+          ignore_chown_errors = "true"
+          EOF
           sudo systemctl start podman.service
 
       - name: Checkout Repo
