@@ -8,9 +8,6 @@ on:
     - cron: "0 9 */2 * *"
   workflow_dispatch:
 
-env:
-  REPO_OWNER: ${{ github.repository_owner }}
-
 permissions: {}
 
 concurrency:
@@ -81,10 +78,9 @@ EOF
         with:
           submodules: recursive
 
-      # The image registry name must be lower-case, but GitHub usernames can be capitalized.
       - name: Get lower-case equivalent of the repository owner's username
         id: repo_owner_case
-        run: echo "lowercase=${REPO_OWNER,,}" >> "$GITHUB_OUTPUT"
+        run: echo "lowercase=${{ toLower(github.repository_owner) }}" >> "$GITHUB_OUTPUT"
 
       - name: Build Container Image
         run: |
