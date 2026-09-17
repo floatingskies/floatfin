@@ -33,6 +33,15 @@ jobs:
           - bluefin-latest.yml
           - bazzite-latest.yml
     steps:
+      # GitHub's ubuntu-24.04 runners ship
+      # kernel.apparmor_restrict_unprivileged_userns=1, which blocks flatpak's
+      # bwrap sandbox inside the rootless container build (bake-flatpaks.sh).
+      - name: Allow unprivileged user namespaces (bwrap/flatpak)
+        run: |
+          if [ "$(sudo sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null || echo 0)" = "1" ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+
        # the build is fully handled by the reusable github action
       - name: Build Custom Image
         uses: blue-build/github-action@v1.13.0
