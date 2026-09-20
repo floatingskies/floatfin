@@ -28,6 +28,8 @@ modules:
         - wget
         # terminal-power-user essentials
         - btop
+        - chafa
+        - ImageMagick-libs
         - fd-find
         - fzf
         - pv
