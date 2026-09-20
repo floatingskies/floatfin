@@ -1,5 +1,5 @@
 [org.gnome.shell]
-favorite-apps=['org.gnome.Nautilus.desktop','com.brave.Browser.desktop','org.libreoffice.LibreOffice.writer.desktop','org.darktable.Darktable.desktop', 'com.discordapp.Discord.desktop','com.spotify.Client.desktop', 'code.desktop', 'io.github.kolunmi.Bazaar.desktop']
+favorite-apps=['org.gnome.Nautilus.desktop','firefox.desktop','org.libreoffice.LibreOffice.writer.desktop','org.darktable.Darktable.desktop', 'com.discordapp.Discord.desktop','com.spotify.Client.desktop', 'code.desktop', 'io.github.kolunmi.Bazaar.desktop']
 
 [org.gnome.desktop.wm.preferences]
 button-layout=':minimize,maximize,close'

@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: bluefin-float
+name: float-bluefin
 # description will be included in the image's metadata
-description: A bit opinionated distro made by Float. Bluefin DX on the latest stream.
+description: Bluefin DX with my personal preferences baked in. This bootable container image follows Bluefin's latest image channel.
 alt-tags:
   - canary
   - latest
@@ -16,9 +16,6 @@ modules:
   - from-file: features/ublue-bluefin-features.yml
   - type: gschema-overrides  # Override Bluefin's overrides of Gnome default fonts
     include:
-      - zz42-ublue-bluefin.gschema.override
-  - type: script
-    env:
-      UBLUE_WALLPAPER: bluefin-woof.png
-    scripts:
-      - set-default-wallpaper.sh
+      - zz42-float-bluefin.gschema.override
+      - zz999-float-wallpaper.gschema.override
+  - type: initramfs  # Regenerate initramfs so the plymouth spinner theme + pixmaps changes are baked in

@@ -1,0 +1,6 @@
+# Default wallpaper: fox, from the floating-skies collection
+
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/floating-skies/fox.jpg'
+picture-uri-dark='file:///usr/share/backgrounds/floating-skies/fox.jpg'
+picture-options='zoom'

@@ -6,7 +6,7 @@ These are [Bootable Container](https://containers.github.io/bootable/) images bu
 
 Modifications common to all images:
 
--   Brave installed as default browser
+-   Firefox installed as default browser
 -   Curated selection of Flatpak apps baked into the image (this overrides Bluefin's default flatpak choices)
 -   [Web App Hub](https://github.com/pvermeer/webapp-hub) to turn your favourite sites into desktop web apps
 -   Network tools baked in as Flatpaks: Wireshark and FileZilla

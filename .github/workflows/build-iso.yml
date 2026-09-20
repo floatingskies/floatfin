@@ -2,10 +2,6 @@
 name: Build Live ISOs
 
 on:
-  schedule:
-    # Rebuild the ISOs every 2 days at 09:00 UTC (after the daily image
-    # builds at 07:00 UTC so the newest images are used).
-    - cron: "0 9 */2 * *"
   workflow_dispatch:
 
 env:
@@ -27,66 +23,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: ublue-float
+          - name: float-bluefin
             tag: stable
-            label: Ublue-Float-Live
-          - name: bluefin-float
-            tag: latest
-            label: Ublue-Bluefin-Live
-          - name: bazzite-float
-            tag: latest
-            label: Ublue-Bazzite-Live
+            label: Float-Bluefin-Live
     steps:
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
         with:
-          # The payload embeds a full expanded copy of the install image in its
-          # own container storage, so the build needs every free GB we can get.
-          # `large-packages` + `swap-storage` reclaim the biggest chunks.
           tool-cache: true
-          large-packages: true
-          docker-images: true
-          swap-storage: true
 
-      - name: Mount Container Storage Loopback
+      - name: Mount Container Storage BTRFS Loopback
         run: |
-          # ext4, not btrfs. The images now bake hardlink-heavy Flatpaks, and
-          # extracting those layers onto a btrfs filesystem fails with
-          # "processing tar file(too many links)" (EMLINK) because of btrfs's
-          # per-inode hardlink limit. ext4 handles the same hardlink farms.
-          sudo truncate -s 120G /mnt/podman-storage.img
-          sudo mkfs.ext4 -F -E nodiscard /mnt/podman-storage.img
+          sudo truncate -s 110G /mnt/podman-storage.img
+          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
           sudo podman system reset --force
           sudo systemctl stop podman.service
           LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
           sudo mkdir -p /mnt/podman-storage
-          sudo mount -o discard,noatime "$LOOP" /mnt/podman-storage
+          sudo mount -o compress-force=zstd:2,discard=async,noatime "$LOOP" /mnt/podman-storage
           sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
           sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
-          # Don't hardlink-dedupe identical files across image layers while
-          # unpacking. The baked Flatpaks + rechunked layers contain "hardlink
-          # farms" (e.g. yum/rpm metadata files with identical content across
-          # every layer), and dedup collapses them onto a single inode whose
-          # link count climbs past ext4's 65000 / btrfs's 65535 limit, killing
-          # the build with "processing tar file(too many links): exit status 1".
-          # With dedup disabled each layer is materialized as ordinary copies.
-          # containers/storage reads `use_hard_links` from the pull_options
-          # table (a string map) and from it recomputes whether to hardlink
-          # identical files across layers. Setting it directly under
-          # `[storage.options]` is NOT a recognized key (decoder warns and
-          # drops it), and runroot/graphroot must be spelled out or c/storage
-          # clears its defaults and fails with "runroot must be set".
-          printf '%s\n' \
-            '[storage]' \
-            'driver = "overlay"' \
-            'runroot = "/run/containers/storage"' \
-            'graphroot = "/var/lib/containers/storage"' \
-            '' \
-            '[storage.options]' \
-            'ignore_chown_errors = "true"' \
-            '' \
-            '[storage.options.pull_options]' \
-            'use_hard_links = "false"' | sudo tee /etc/containers/storage.conf >/dev/null
           sudo systemctl start podman.service
 
       - name: Checkout Repo
@@ -99,20 +55,19 @@ jobs:
         id: repo_owner_case
         run: echo "lowercase=${REPO_OWNER,,}" >> "$GITHUB_OUTPUT"
 
-      # Build the installer payload (installer/) FROM the release image. The
-      # payload embeds the install image in its own container storage so
-      # Anaconda can install offline via --transport=containers-storage.
-      # --squash, like titanoboa's own bazzite example, keeps the payload as a
-      # single flat layer. No buildah layer cache: it accumulated stale layers
-      # that failed to unpack on the runner, and dropping it keeps builds
-      # reproducible.
       - name: Build Container Image
         run: |
           IMAGE="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/${{ matrix.name }}:${{ matrix.tag }}"
+          CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/float-iso-cache-${{ matrix.name }}"
+          echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          # note: buildah's cache flags take a bare repository reference (no
+          # tag/digest and no BuildKit "type=registry,ref=...,mode=max" syntax),
+          # so keep each matrix row's cache in its own repo name
           sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
             --cap-add sys_admin \
             --security-opt label=disable \
-            --squash \
+            --cache-from "$CACHE_REPO" \
+            --cache-to "$CACHE_REPO" \
             --build-arg BASE_IMAGE="$IMAGE" \
             --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
             --build-arg ISO_LABEL="${{ matrix.label }}" \
@@ -155,3 +110,58 @@ jobs:
           retention-days: 7
           compression-level: 0
           overwrite: true
+
+  publish-release:
+    name: Publish Latest ISO Release
+    runs-on: ubuntu-latest
+    needs: build-iso
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Publish the freshly built ISOs as a public GitHub Release so the
+      # website (and anyone else) can download them without authentication.
+      # Workflow artifacts are private; release assets are public.
+      - name: Download ISO Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: isos
+          merge-multiple: true
+
+      - name: Generate Release Body
+        shell: bash
+        run: |
+          REPO="${{ github.repository }}"
+          {
+            echo "Live desktop ISOs built automatically from the \`main\` branch."
+            echo
+            echo "Each ISO boots into the full desktop from the image and can install it to disk with the on-screen **Install to Disk** (Anaconda) launcher. Secure Boot is supported via the Universal Blue enrollment key."
+            echo
+            echo "## What changed since the previous ISO"
+            PREV=$(gh release view iso-latest --json tagName -q '.tagName' 2>/dev/null || true)
+            if [[ -n "$PREV" ]]; then
+              gh api "repos/$REPO/compare/$PREV...main" \
+                --jq '.commits[] | "- " + (.commit.message | split("\n")[0])'
+            else
+              echo "- First ISO release for this repository."
+            fi
+          } > release-body.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Publish / Update ISO Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: iso-latest
+          name: Float Live ISO (latest)
+          make_latest: true
+          overwrite: true
+          fail_on_unmatched_files: true
+          body_path: release-body.md
+          files: |
+            isos/*.iso
+            isos/*-CHECKSUM

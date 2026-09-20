@@ -21,3 +21,4 @@ modules:
       - install-framework-wallpaper.sh
       - install-kde-wallpapers.sh
       - install-floating-woof.sh
+      - install-floating-skies.sh

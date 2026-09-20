@@ -10,3 +10,4 @@ modules:
         - netcat
         - fastfetch
         - clinfo
+        - firefox

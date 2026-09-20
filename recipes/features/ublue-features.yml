@@ -13,4 +13,3 @@ modules:
   - from-file: features/gnome-ui-fixes.yml
   - from-file: features/ublue-overrides.yml
   - from-file: features/wallpapers.yml
-  - from-file: features/flatpaks.yml
