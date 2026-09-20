@@ -14,6 +14,7 @@ image-version: latest # latest is also supported if you want new updates ASAP
 # you can include multiple instances of the same module
 modules:
   - from-file: features/ublue-bluefin-features.yml
+  - from-file: features/devops.yml
   - from-file: features/steam.yml
   - type: gschema-overrides  # Override Bluefin's overrides of Gnome default fonts
     include:

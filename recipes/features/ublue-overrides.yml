@@ -28,7 +28,6 @@ modules:
       - setools-console
       - lm_sensors
       - firewall-config
-      - ublue-motd
       - uupd
       - bcache-tools
       - git-credential-libsecret

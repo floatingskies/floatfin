@@ -1,4 +1,4 @@
-# ublue-float &nbsp; [![bluebuild build badge](https://github.com/floatingskies/ublue-float/actions/workflows/build-daily.yml/badge.svg)](https://github.com/floatingskies/ublue-float/actions/workflows/build-daily.yml)
+# floatfin &nbsp; [![bluebuild build badge](https://github.com/floatingskies/floatfin/actions/workflows/build-daily.yml/badge.svg)](https://github.com/floatingskies/floatfin/actions/workflows/build-daily.yml)
 
 A bit opinionated distro made by Float.
 
@@ -19,7 +19,9 @@ Modifications baked into the image:
 -   Windows have minimize and maximize buttons
 -   Touchpad tap-to-click enabled
 -   Fedora/GDM logo pixmaps and the Plymouth spinner watermark swapped for our own, and the initramfs rebuilt so they show from first boot
--   The OS identifies itself as *Ublue Float Bluefin* (Settings → About, installer branding, hostname)
+-   The OS identifies itself as *Floatfin Bluefin* (Settings → About, installer branding, hostname)
+-   Bluefin's *uwelcome* login banner is removed; instead the fish greeting (and `fastfetch`) shows a lean system summary with the foxy.png logo and a **Floatfin** title
+-   A dev-ops / sysadmin / web-dev CLI toolkit baked in: `ansible-core`, `gh`, `git-lfs`, `jq`, `shellcheck`, `sshpass`, `bind-utils`, `htop`, `iotop`, `iperf3`, `mtr`, `ncdu`, `net-tools`, `sysstat`, `tmux`, `tree`, `whois`, `wget`, `btop`, `fd-find`, `fzf`, `pv`, `ripgrep`, `nodejs`, `npm`, and `python3-pip`
 
 From Bluefin DX, you keep the usual developer tooling out of the box: VS Code, Docker/Podman, a Logo Menu, appindicator support and the `<CTRL><ALT>t` terminal shortcut. Rootful Docker and Starship are disabled by default, and Tailscale doesn't autostart.
 
@@ -62,7 +64,7 @@ where `$IMAGE_NAME` is `float-bluefin` and `$TAG_NAME` corresponds to `stable`, 
 
 ## Live ISO Images
 
-Like [Bluefin](https://projectbluefin.io) and [Bazzite](https://bazzite.gg), live desktop ISOs are built using [Titanoboa](https://github.com/ublue-os/titanoboa). Trigger the **"Build Live ISOs"** GitHub Actions workflow ([Actions → Build Live ISOs](https://github.com/floatingskies/ublue-float/actions/workflows/build-iso.yml)) and download the artifact:
+Like [Bluefin](https://projectbluefin.io) and [Bazzite](https://bazzite.gg), live desktop ISOs are built using [Titanoboa](https://github.com/ublue-os/titanoboa). Trigger the **"Build Live ISOs"** GitHub Actions workflow ([Actions → Build Live ISOs](https://github.com/floatingskies/floatfin/actions/workflows/build-iso.yml)) and download the artifact:
 
 -   `float-bluefin-stable-live-amd64.iso` — live Bluefin desktop with the installed image inside
 

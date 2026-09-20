@@ -14,6 +14,7 @@ image-version: latest
 modules:
   - from-file: features/system-files.yml
   - from-file: features/application-rpms.yml
+  - from-file: features/devops.yml
   - from-file: features/cockpit.yml
   - from-file: features/fonts.yml
   - from-file: features/gnome-ui-fixes.yml
