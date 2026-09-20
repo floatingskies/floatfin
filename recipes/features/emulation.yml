@@ -6,9 +6,7 @@
 modules:
   - type: dnf
     repos:
-      rpmfusion:
-        free: true
-        nonfree: true
+      nonfree: rpmfusion
     install:
       packages:
         - retroarch
