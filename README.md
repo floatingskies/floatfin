@@ -1,14 +1,16 @@
-# float-bluefin &nbsp; [![bluebuild build badge](https://github.com/floatingskies/ublue-float/actions/workflows/build-daily.yml/badge.svg)](https://github.com/floatingskies/ublue-float/actions/workflows/build-daily.yml)
+# ublue-float &nbsp; [![bluebuild build badge](https://github.com/floatingskies/ublue-float/actions/workflows/build-daily.yml/badge.svg)](https://github.com/floatingskies/ublue-float/actions/workflows/build-daily.yml)
 
 A bit opinionated distro made by Float.
 
-A [Bootable Container](https://containers.github.io/bootable/) image built on top of [Bluefin DX](https://projectbluefin.io) with [BlueBuild](https://blue-build.org)'s tools. Everything below is baked into the image at build time as a layer over the Universal Blue base, including a regenerated initramfs so the boot-time branding survives.
+A set of [Bootable Container](https://containers.github.io/bootable/) images built on top of [Bluefin DX](https://projectbluefin.io) and [Bazzite](https://bazzite.gg) (GNOME) with [BlueBuild](https://blue-build.org)'s tools. Everything below is baked into the image at build time as a layer over the Universal Blue base, including a regenerated initramfs so the boot-time branding survives.
 
 Modifications baked into the image:
 
 -   Firefox as the default browser (installed from RPM)
--   **fox.jpg as the default wallpaper** — the fox lives in the `floating-skies` collection, available alongside `floating-woof` and the System76, Framework, Ubuntu, and KDE/Plasma collections in the GNOME wallpaper picker
--   [Intel One Mono](https://www.intel.com/content/www/us/en/company-overview/one-monospace-font.html) set as default monospace font
+-   **Per-flavor default wallpapers** — `bluefin-woof.png` on Bluefin, `bazzite-woof.png` on Bazzite, both from the `floating-woof` collection (available alongside `floating-skies` and the System76, Framework, Ubuntu, and KDE/Plasma collections in the GNOME wallpaper picker)
+-   [Intel One Mono](https://www.intel.com/content/www/us/en/company-overview/one-monospace-font.html) set as the default interface font (the document font stays Adwaita Sans)
+-   **Retro gaming baked in** — RetroArch plus its assets, and emulators for NES (`nestopia`, `fceux`), SNES (`snes9x`), Game Boy / Color (`gambatte`), Game Boy Advance (`mGBA`, `visualboyadvance-m`) and Mega Drive/Genesis (`mednafen`), installed from RPM
+-   Steam installed on the Bluefin images (Bazzite already ships it)
 -   Clocks set to AM/PM view with Weekday Display
 -   Single click to open items in Nautilus
 -   Use smaller icons in Nautilus icon view
@@ -31,6 +33,7 @@ Bluefin's default Flatpaks still install on first login; no extra Flatpaks are b
 -   `ghcr.io/floatingskies/float-bluefin:gts` -- Bluefin's gts stream, updated weekly
 -   `ghcr.io/floatingskies/float-bluefin:stable` -- Bluefin's stable-weekly stream, updated weekly
 -   `ghcr.io/floatingskies/float-bluefin:latest` -- Bluefin's latest stream, updated daily
+-   `ghcr.io/floatingskies/float-bazzite:latest` -- Bazzite (GNOME) DX, updated daily
 
 ## Installation
 
@@ -74,6 +77,7 @@ These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](ht
 cosign verify --key cosign.pub ghcr.io/floatingskies/float-bluefin:gts
 cosign verify --key cosign.pub ghcr.io/floatingskies/float-bluefin:stable
 cosign verify --key cosign.pub ghcr.io/floatingskies/float-bluefin:latest
+cosign verify --key cosign.pub ghcr.io/floatingskies/float-bazzite:latest
 ```
 
 ## Building Locally

@@ -1,0 +1,6 @@
+# Default wallpaper: bluefin variant of the floating-woof collection
+
+[org.gnome.desktop.background]
+picture-uri='file:///usr/share/backgrounds/floating-woof/bluefin-woof.png'
+picture-uri-dark='file:///usr/share/backgrounds/floating-woof/bluefin-woof.png'
+picture-options='zoom'

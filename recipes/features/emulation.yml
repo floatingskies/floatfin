@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/module-stage-list-v1.json
+
+# RetroArch + the libretro cores Fedora ships, plus standalone emulators
+# for NES, SNES, GB/GBC, GBA and Mega Drive/Genesis (RPM Fusion adds the
+# standalone NES/SNES emulators Fedora does not carry).
+modules:
+  - type: dnf
+    repos:
+      rpmfusion:
+        free: true
+        nonfree: true
+    install:
+      packages:
+        - retroarch
+        - retroarch-assets
+        - retroarch-filters
+        - retroarch-database
+        - libretro-nestopia
+        - libretro-mgba
+        - libretro-gambatte
+        - mednafen
+        - visualboyadvance-m
+        - fceux
+        - snes9x
