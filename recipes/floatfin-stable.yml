@@ -1,14 +1,14 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: float-bluefin
+name: floatfin
 # description will be included in the image's metadata
-description: Bluefin DX with my personal preferences baked in. This bootable container image follows Bluefin's gts image channel.
-
+description: Bluefin DX with my personal preferences baked in. This bootable container image follows Bluefin's stable-weekly image channel.
 alt-tags:
-  - gts
+  - stable
+  - stable-weekly
 
 # the base image to build on top of (FROM) and the version tag to use
 base-image: ghcr.io/ublue-os/bluefin-dx
-image-version: gts
+image-version: stable
 
 # module configuration, executed in order
 # you can include multiple instances of the same module

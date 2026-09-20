@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: float-bluefin
+name: floatfin
 # description will be included in the image's metadata
 description: Bluefin DX with my personal preferences baked in. This bootable container image follows Bluefin's latest image channel.
 alt-tags:

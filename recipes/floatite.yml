@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://schema.blue-build.org/recipe-v1.json
-name: float-bazzite
+name: floatite
 # description will be included in the image's metadata
 description: Bazzite (GNOME) with my personal preferences baked in. This bootable container image follows Bazzite's latest image channel.
 alt-tags:

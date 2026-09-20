@@ -19,7 +19,7 @@ Modifications baked into the image:
 -   Windows have minimize and maximize buttons
 -   Touchpad tap-to-click enabled
 -   Fedora/GDM logo pixmaps and the Plymouth spinner watermark swapped for our own, and the initramfs rebuilt so they show from first boot
--   The OS identifies itself as *Floatfin Bluefin* (Settings → About, installer branding, hostname)
+-   The OS identifies itself as *Floatfin* (Bluefin-based images) and *Floatite* (Bazzite-based images) — Settings → About, installer branding, hostname
 -   Bluefin's *uwelcome* login banner is removed; instead the fish greeting (and `fastfetch`) shows a lean system summary with the foxy.png logo and a **Floatfin** title
 -   A dev-ops / sysadmin / web-dev CLI toolkit baked in: `ansible-core`, `gh`, `git-lfs`, `jq`, `shellcheck`, `sshpass`, `bind-utils`, `htop`, `iotop`, `iperf3`, `mtr`, `ncdu`, `net-tools`, `sysstat`, `tmux`, `tree`, `whois`, `wget`, `btop`, `fd-find`, `fzf`, `pv`, `ripgrep`, `nodejs`, `npm`, and `python3-pip`
 
@@ -29,12 +29,12 @@ Bluefin's default Flatpaks still install on first login; no extra Flatpaks are b
 
 ## Image Tags
 
-`float-bluefin` is an overlay on [Bluefin DX](https://docs.projectbluefin.io/administration#upgrades-and-throttle-settings) following Bluefin's image channels:
+`floatfin` is an overlay on [Bluefin DX](https://docs.projectbluefin.io/administration#upgrades-and-throttle-settings) following Bluefin's image channels:
 
--   `ghcr.io/floatingskies/float-bluefin:gts` -- Bluefin's gts stream, updated weekly
--   `ghcr.io/floatingskies/float-bluefin:stable` -- Bluefin's stable-weekly stream, updated weekly
--   `ghcr.io/floatingskies/float-bluefin:latest` -- Bluefin's latest stream, updated daily
--   `ghcr.io/floatingskies/float-bazzite:latest` -- Bazzite (GNOME) DX, updated daily
+-   `ghcr.io/floatingskies/floatfin:gts` -- Bluefin's gts stream, updated weekly
+-   `ghcr.io/floatingskies/floatfin:stable` -- Bluefin's stable-weekly stream, updated weekly
+-   `ghcr.io/floatingskies/floatfin:latest` -- Bluefin's latest stream, updated daily
+-   `ghcr.io/floatingskies/floatite:latest` -- Bazzite (GNOME) DX, updated daily
 
 ## Installation
 
@@ -43,7 +43,7 @@ First, install any [Fedora Atomic](https://fedoraproject.org/atomic-desktops/) o
 Then use `bootc switch` to switch to the image. For example:
 
 ```
-sudo bootc switch ghcr.io/floatingskies/float-bluefin:latest --enforce-container-sigpolicy
+sudo bootc switch ghcr.io/floatingskies/floatfin:latest --enforce-container-sigpolicy
 ```
 
 Then reboot
@@ -57,16 +57,16 @@ systemctl reboot
 If you have `podman` installed on your system, you can generate an offline ISO with the `download-iso.sh` script in this directory, like this:
 
 ```
-./download-iso.sh float-bluefin stable
+./download-iso.sh floatfin stable
 ```
 
-where `$IMAGE_NAME` is `float-bluefin` and `$TAG_NAME` corresponds to `stable`, `gts`, or `latest` (the script defaults to `float-bluefin:gts` if you omit both).
+where `$IMAGE_NAME` is `floatfin` and `$TAG_NAME` corresponds to `stable`, `gts`, or `latest` (the script defaults to `floatfin:gts` if you omit both).
 
 ## Live ISO Images
 
 Like [Bluefin](https://projectbluefin.io) and [Bazzite](https://bazzite.gg), live desktop ISOs are built using [Titanoboa](https://github.com/ublue-os/titanoboa). Trigger the **"Build Live ISOs"** GitHub Actions workflow ([Actions → Build Live ISOs](https://github.com/floatingskies/floatfin/actions/workflows/build-iso.yml)) and download the artifact:
 
--   `float-bluefin-stable-live-amd64.iso` — live Bluefin desktop with the installed image inside
+-   `floatfin-stable-live-amd64.iso` — live Bluefin desktop with the installed image inside
 
 Boot the ISO and you get the full desktop running live from the image. To install the image to disk, launch **"Install to Disk"** from the desktop (Anaconda). The installer will also offer to enroll the Universal Blue secure boot key (password: `universalblue`) so it can boot with Secure Boot; it also works fine without Secure Boot, or you can enroll your own keys later.
 
@@ -75,10 +75,10 @@ Boot the ISO and you get the full desktop running live from the image. To instal
 These images are signed with [Sigstore](https://www.sigstore.dev/)'s [cosign](https://github.com/sigstore/cosign). You can verify the signature by downloading the `cosign.pub` file from this repo and running the following command:
 
 ```
-cosign verify --key cosign.pub ghcr.io/floatingskies/float-bluefin:gts
-cosign verify --key cosign.pub ghcr.io/floatingskies/float-bluefin:stable
-cosign verify --key cosign.pub ghcr.io/floatingskies/float-bluefin:latest
-cosign verify --key cosign.pub ghcr.io/floatingskies/float-bazzite:latest
+cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:gts
+cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:stable
+cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:latest
+cosign verify --key cosign.pub ghcr.io/floatingskies/floatite:latest
 ```
 
 ## Building Locally

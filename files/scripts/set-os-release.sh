@@ -9,8 +9,8 @@ set -euo pipefail
 # The flavor is detected from the base image's own os-release ID, so this file
 # keeps working through base-image and Fedora version bumps with no edits:
 #
-#   base ID is bluefin  -> "Floatfin Bluefin"
-#   base ID is bazzite  -> "Floatfin Bazzite"
+#   base ID is bluefin  -> "Floatfin"
+#   base ID is bazzite  -> "Floatite"
 #   anything else       -> "Floatfin"
 #
 # Fields that describe the underlying OS (VERSION_ID, VERSION_CODENAME,
@@ -42,14 +42,14 @@ BASE_SUPPORT_END="$(get_kv SUPPORT_END)"
 
 case "$BASE_ID" in
     bluefin*)
-        IMAGE_NAME="${IMAGE_NAME:-Floatfin Bluefin}"
-        IMAGE_ID="${IMAGE_ID:-floatfin-bluefin}"
-        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-floatfin-bluefin}"
+        IMAGE_NAME="${IMAGE_NAME:-Floatfin}"
+        IMAGE_ID="${IMAGE_ID:-floatfin}"
+        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-floatfin}"
         ;;
     bazzite*)
-        IMAGE_NAME="${IMAGE_NAME:-Floatfin Bazzite}"
-        IMAGE_ID="${IMAGE_ID:-floatfin-bazzite}"
-        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-floatfin-bazzite}"
+        IMAGE_NAME="${IMAGE_NAME:-Floatite}"
+        IMAGE_ID="${IMAGE_ID:-floatite}"
+        IMAGE_HOSTNAME="${IMAGE_HOSTNAME:-floatite}"
         ;;
     *)
         IMAGE_NAME="${IMAGE_NAME:-Floatfin}"

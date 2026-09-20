@@ -29,8 +29,8 @@ jobs:
       matrix:
         recipe:
           # !! Add your recipes here 
-          - float-bluefin-latest.yml
-          - float-bazzite.yml
+          - floatfin-latest.yml
+          - floatite.yml
     steps:
        # the build is fully handled by the reusable github action
       - name: Build Custom Image
