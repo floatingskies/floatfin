@@ -10,3 +10,4 @@ modules:
     # (flavor is auto-detected from the base image).
     scripts:
       - set-os-release.sh
+      - disable-ublue-motd.sh
