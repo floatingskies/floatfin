@@ -9,8 +9,8 @@ Modifications baked into the image:
 -   Firefox as the default browser (installed from RPM)
 -   **Per-flavor default wallpapers** — `bluefin-woof.png` on Bluefin, `bazzite-woof.png` on Bazzite, both from the `floating-woof` collection (available alongside `floating-skies` and the System76, Framework, Ubuntu, and KDE/Plasma collections in the GNOME wallpaper picker)
 -   [Intel One Mono](https://www.intel.com/content/www/us/en/company-overview/one-monospace-font.html) set as the default interface font (the document font stays Adwaita Sans)
--   **Retro gaming baked in** — RetroArch plus its assets, and emulators for NES (`nestopia`, `fceux`), SNES (`snes9x`), Game Boy / Color (`gambatte`), Game Boy Advance (`mGBA`, `visualboyadvance-m`) and Mega Drive/Genesis (`mednafen`), installed from RPM
--   Steam installed on the Bluefin images (Bazzite already ships it)
+-   **Retro gaming baked in** — RetroArch plus its assets, and emulators for NES (`nestopia`, `mednafen`), SNES (`mednafen`), Game Boy / Color (`gambatte`), Game Boy Advance (`mGBA`, `visualboyadvance-m`) and Mega Drive/Genesis (`mednafen`), installed from RPM
+-   Steam installed on the Bluefin images from negativo17 (Bazzite already ships it)
 -   Clocks set to AM/PM view with Weekday Display
 -   Single click to open items in Nautilus
 -   Use smaller icons in Nautilus icon view
