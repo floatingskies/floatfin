@@ -11,3 +11,4 @@ modules:
     scripts:
       - set-os-release.sh
       - disable-ublue-motd.sh
+      - optimize-gnome.sh

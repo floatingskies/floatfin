@@ -1,5 +1,5 @@
 [org/gnome/shell]
-favorite-apps=['org.gnome.Nautilus.desktop','firefox.desktop','org.libreoffice.LibreOffice.writer.desktop','org.darktable.darktable.desktop', 'com.discordapp.Discord.desktop','com.spotify.Client.desktop', 'code.desktop', 'io.github.kolunmi.Bazaar.desktop']
+favorite-apps=['org.gnome.Nautilus.desktop','firefox.desktop','code.desktop']
 
 [org/gnome/nautilus/icon-view]
 default-zoom-level='small-plus'
@@ -11,17 +11,6 @@ migrated-gtk-settings=true
 search-filter-time-type='last_modified'
 show-create-link=true
 show-delete-permanently=true
-
-[org/gnome/shell/extensions/dash-to-dock]
-background-opacity=0.75
-custom-theme-shrink=true
-dash-max-icon-size=48
-dock-position='BOTTOM'
-intellihide-mode='FOCUS_APPLICATION_WINDOWS'
-require-pressure-to-show=false
-transparency-mode='FIXED'
-disable-overview-on-startup=true
-running-indicator-style='DOTS'
 
 [org/gnome/desktop/interface]
 clock-format='12h'

@@ -11,20 +11,21 @@ Custom bootable container images tailored for production systems, workstations, 
 
 ### System Branding & Aesthetic
 * **Float Identity:** Custom *Floatfin* and *Floatite* identity integrated into Settings, installer branding, hostname, Plymouth boot splash, and GDM login screen.
-* **Default Wallpaper:** `fox.jpg` from the `floating-skies` collection set as default, alongside `floating-woof`, System76, Framework, Ubuntu, and KDE/Plasma options.
+* **Default Wallpaper:** `firewatch-view02.jpg` from the built-in `floatfin` collection — the only wallpapers shipped (stock GNOME, Fedora, KDE/Plasma and other distro collections are purged at build time).
 * **Typography:** **Intel One Mono** set as the primary interface font (Adwaita Sans retained for documents).
 * **Terminal Experience:** Custom `fastfetch` and login greeting displaying system status alongside the `foxy.png` logo, replacing *uwelcome*.
 * **Appearance:** Dark mode enabled out of the box.
 
 ### Desktop & Interface Tweaks
-* **Dock & Navigation:** Dash-to-Dock docked at the bottom, configured to skip the Overview screen on login.
+* **Performance-First GNOME:** Bloatware apps (GNOME games, welcome tour, App Center) removed, background services (Bluetooth daemon, ModemManager, ABRT, printer browsing, tuned, Tracker file indexers, PackageKit) disabled, animations off, and tuned swap/cache settings — idle GNOME sits around **900 MB – 1 GB** of RAM.
 * **Window Controls:** Minimize and maximize buttons enabled.
 * **File Manager (Nautilus):** Single-click item opening, compact icon view, and directories sorted first across Nautilus and GTK file choosers.
 * **Input & Clock:** Touchpad tap-to-click enabled by default; 12-hour AM/PM clock display with weekday headers.
 
 ### Applications & Tooling
 * **Browsing & Gaming:** Firefox installed as the default browser via RPM. Steam pre-installed from `negativo17` on Bluefin builds (native on Bazzite).
-* **Bluefin DX Base:** Retains VS Code, Docker/Podman support, Logo Menu, AppIndicator integration, and the `<Ctrl><Alt>T` terminal shortcut.
+* **Bluefin DX Base:** Retains VS Code, Docker/Podman support, and Homebrew. On the shell: **Caffeine**, the **AppIndicator** tray and the **system-monitor-next** applet stay active, while Universal Blue's Logo Menu, Blur My Shell and Dash-to-Dock are disabled, and the `Ctrl+Alt+T` terminal shortcut stays.
+* **Package ecosystem friendly:** Homebrew, Flathub/flatpak and Nix all work out of the box — the image just ships **no flatpaks** (or flatpak dock pins) by default.
 * **Baked-in DevOps & Sysadmin Suite:**
   * **Automation & Dev:** `ansible-core`, `gh`, `git-lfs`, `jq`, `shellcheck`, `nodejs`, `npm`, `python3-pip`
   * **Networking & Utilities:** `bind-utils`, `iperf3`, `mtr`, `net-tools`, `sshpass`, `whois`, `wget`
