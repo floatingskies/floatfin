@@ -1,7 +1,8 @@
 function fish_greeting
-    # Bluefin's uwelcome banner is replaced by a fastfetch
-    # system summary (foxy.png logo). Skipped if the bash login already
-    # greeted us (UWELCOME_SHOWN is inherited from the parent shell).
+    # Floatfin login banner: a fastfetch system summary with the foxy.txt
+    # mascot (config: /usr/share/ublue-os/fastfetch.jsonc). Skipped if the
+    # bash login already greeted us (UWELCOME_SHOWN is inherited) or the
+    # user opted out with ~/.config/no-show-user-motd.
     if test -e ~/.config/no-show-user-motd
         return
     end
@@ -10,6 +11,7 @@ function fish_greeting
     end
     if not set -q UWELCOME_SHOWN
         set -gx UWELCOME_SHOWN 1
-        type -q ublue-fastfetch; and ublue-fastfetch
+        type -q fastfetch; and fastfetch --config /usr/share/ublue-os/fastfetch.jsonc
+        echo '  wizard-fox tip: type "float" for a guided tour (beginner, workbench or power)'
     end
 end

@@ -40,8 +40,8 @@ modules:
       - gnome-software
 - type: systemd
   system:
-    enabled:
+    enable:
       - uupd.timer
-    disabled:
+    disable:
       - rpm-ostreed-automatic.timer
       - flatpak-system-update.timer

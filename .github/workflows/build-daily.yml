@@ -7,7 +7,7 @@ on:
     paths-ignore: # don't rebuild if only stuff the workflow doesn't run has changed
       - "**.md"
       - "/*.sh"
-      - "iso-config/**"
+      - "installer/**"
       
   pull_request:
   workflow_dispatch: # allow manually triggering builds

@@ -8,8 +8,10 @@ modules:
   - from-file: features/application-rpms.yml
   - from-file: features/fonts.yml
   - from-file: features/gnome-ui-fixes.yml
+  - from-file: features/terminal.yml
   - from-file: features/wallpapers.yml
   - from-file: features/cockpit.yml
   - from-file: features/virtualization.yml
   - from-file: features/gaming.yml
+  - from-file: features/nix.yml
   - from-file: features/ublue-bluefin-overrides.yml

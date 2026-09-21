@@ -2,11 +2,18 @@
 
 Immutable, signed, bootable-container desktop images tuned for **sysadmin / devops work and gaming**. Built on [Bluefin DX](https://projectbluefin.io) and [Bazzite (GNOME)](https://bazzite.gg) with [BlueBuild](https://blue-build.org); every tweak is baked in at build time.
 
+**Ours is the *wizard-fox* terminal-first edition**: same rock-solid immutable base, but the terminal is a first-class citizen and every skill level has a door. Type `float` in any terminal and the wizard walks you from first boot to power-user tricks.
+
+<p align="center"><img src="branding/foxy.png" alt="Floatfin — the wizard fox" width="320"></p>
+
 ## Why you'd retire for this
 
 - **A real admin console out of the box** — [Cockpit](https://cockpit-project.org) (system/storage/network/containers web UI) enabled on boot at `https://<host>:9090`, `sshd` enabled, and a full CLI battery: `ansible-core`, `tmux`, `btop`, `htop`, `iotop`, `ncdu`, `lsof`, `psmisc`, `strace`, `nmap`, `tcpdump`, `rsync`, `sysstat`, `iperf3`, `mtr`, `smartctl`…
+- **Terminal-first, but friendly** — curated **fish** + **Starship** prompt in Fira Code: `l`/`cat`/`top` already map to `eza`/`bat`/`btop`, `cd` jumps with zoxide, and the **`float` wizard** walks you through three tiers: *the easy tour* (updates, installs, GNOME Tour), *the workbench* (distrobox, nix, podman, ssh, Cockpit) and *system power tools* (bootc rebase/rollback, cosign verify, audits). Beginners aren't an afterthought.
+- **The whole GNOME core, native RPMs** — Calendar, Clocks, Contacts, Maps, Weather, Connections, Calculator, Characters, Text Editor, `seahorse`… plus the interactive **GNOME Tour** for first-timers. No flatpaks baked in; search providers wired up for the installed set.
 - **Performance-tuned GNOME** — idle RAM ~1.5 GB (stock desktop images idle near 2 GB and up): bloatware and ~20 idle services (Bluetooth daemon, remote desktop, ModemManager, ABRT, PackageKit, Tracker indexers, auto-update timers…) purged; animations off; tuned swap/cache + BBR networking.
-- **Devops workbench** — Bluefin DX base: VS Code, rootless Docker + podman, Homebrew. On top: `podman.socket`, `podman-compose`, `buildah`, `skopeo`, `gh`, `git-lfs`, `yq`, `bat`, `eza`, `duf`, `fzf`, `ripgrep`, `fd-find`, `nodejs`/`npm`/`python3-pip`. Nix works too.
+- **Devops workbench** — Bluefin DX base: VS Code, rootless Docker + podman, Homebrew. On top: `podman.socket`, `podman-compose`, **`distrobox`**, `buildah`, `skopeo`, `gh`, `git-lfs`, `yq`, `bat`, `eza`, `duf`, `fzf`, `ripgrep`, `fd-find`, `nodejs`/`npm`/`python3-pip`.
+- **Nix, ready to go** — Fedora's official Nix with **flakes enabled by default** and a socket-activated multi-user daemon sharing one store across users: `nix run nixpkgs#hello`, `nix develop`, `nix-shell`. (Also Homebrew and Flatpak coexist fine.)
 - **KVM virtualization** — libvirt, `virt-manager` and VM tooling ready to go.
 - **Gaming ready** — Steam (Bluefin builds), **GameMode**, **Gamescope**, **Mangohud** (32-bit included), Vulkan tools.
 - **Flatpak-ready, zero flatpaks shipped** — Flathub works; nothing baked in. Dock shows only native apps.
@@ -29,14 +36,19 @@ systemctl reboot
 
 ## ISO & live desktop
 
-- **Live ISO:** trigger the **Build Live ISOs** workflow in Actions, boot the artifact, then run **Install to Disk**. Secure Boot supported.
+- **Live ISO:** trigger the **Build Live ISOs** workflow in Actions, download the `*-live` artifact (kept **7 days** — too big for GitHub Releases), boot it, then run **Install to Disk**. Secure Boot supported.
 - **Offline ISO:** `./download-iso.sh floatfin gts` *(tag: `gts`, `stable` or `latest`)*
 
 ## Day-1 commands
 
 ```bash
-ssh <host>                      # remote shell (openssh enabled)
+float                           # the wizard: easy tour → workbench → power tools
+ssh <host>                      # remote shell (openssh socket-activated)
 https://<host>:9090             # Cockpit admin web UI
+distrobox enter fedora          # drop into a full Fedora container, share ~
+distrobox enter ubuntu -- bash  # ...or any other distro
+nix run nixpkgs#hello           # first Nix command (spins up the daemon on demand)
+nix develop nixpkgs#python3     # drop into a Python shell from nixpkgs
 gamemoderun %command%           # per-game: GameMode CPU/I-O priority (Steam launch option)
 MANGOHUD=1 %command%            # per-game: enable the Mangohud overlay
 ```

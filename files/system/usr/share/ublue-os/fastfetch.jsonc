@@ -26,12 +26,6 @@
     },
     "break",
     {
-      "type": "command",
-      "key": "Image",
-      "keyColor": "#5ebede",
-      "text": "/usr/bin/ublue-image-info.sh"
-    },
-    {
       "type": "os",
       "key": "OS",
       "keyColor": "#5ebede",

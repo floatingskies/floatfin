@@ -57,6 +57,9 @@ modules:
         - buildah
         - skopeo
         - podman-compose
+        # distrobox: one terminal command drops you into a full distro
+        # container that shares your home. The friendly path to Linux distros.
+        - distrobox
         # web development
         - nodejs
         - npm
