@@ -1,6 +1,6 @@
 # Default wallpaper: fox.jpg from the floating-skies collection
 
 [org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/tree-of-life/tree-of-life-light.png'
-picture-uri-dark='file:///usr/share/backgrounds/tree-of-life/tree-of-life-night.png'
+picture-uri='file:///usr/share/backgrounds/crystalline_gravity/crystalline_gravity-l.png'
+picture-uri-dark='file:///usr/share/backgrounds/crystalline_gravity/crystalline_gravity-d.png'
 picture-options='zoom'

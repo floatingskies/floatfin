@@ -1,6 +1,6 @@
 # Default wallpaper: fox.jpg from the floating-skies collection
 
 [org.gnome.desktop.background]
-picture-uri='file:///usr/share/backgrounds/floating-continent/floating-continent-light.jpg'
-picture-uri-dark='file:///usr/share/backgrounds/floating-continent/floating-continent-night.jpg'
+picture-uri='file:///usr/share/backgrounds/starstruck/starstruck-l.webp'
+picture-uri-dark='file:///usr/share/backgrounds/starstruck/starstruck-d.webp'
 picture-options='zoom'
