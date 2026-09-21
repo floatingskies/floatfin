@@ -1,6 +1,6 @@
 #!/usr/bin/bash
-# Floatfin GNOME optimization: free up RAM (target ~900 MB - 1 GB idle GNOME)
-# and make the desktop feel snappy.
+# Floatfin GNOME optimization: free up RAM (idle GNOME trimmed from ~2 GB stock
+# to ~1.5 GB and snappier with animations/heavy indexers off).
 #
 #  1. Removes RPM-installed GNOME apps that sit unused on a Bluefin/Bazzite DX
 #     desktop (GNOME games, the welcome tour, help docs, the old App Center).
@@ -62,6 +62,8 @@ disable_units=(
     cups-browsed.service
     dnf-makecache.timer
     flatpak-system-update.timer
+    fprintd.service
+    gnome-remote-desktop.service
     ModemManager.service
     NetworkManager-wait-online.service
     rhsmcertd.service

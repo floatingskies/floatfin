@@ -5,7 +5,7 @@ Immutable, signed, bootable-container desktop images tuned for **sysadmin / devo
 ## Why you'd retire for this
 
 - **A real admin console out of the box** — [Cockpit](https://cockpit-project.org) (system/storage/network/containers web UI) enabled on boot at `https://<host>:9090`, `sshd` enabled, and a full CLI battery: `ansible-core`, `tmux`, `btop`, `htop`, `iotop`, `ncdu`, `lsof`, `psmisc`, `strace`, `nmap`, `tcpdump`, `rsync`, `sysstat`, `iperf3`, `mtr`, `smartctl`…
-- **Performance-tuned GNOME** — idle RAM ~900 MB–1 GB. Bloatware and ~20 idle services (Bluetooth daemon, ModemManager, ABRT, PackageKit, Tracker indexers, auto-update timers…) purged; animations off; tuned swap/cache + BBR networking.
+- **Performance-tuned GNOME** — idle RAM ~1.5 GB (stock desktop images idle near 2 GB and up): bloatware and ~20 idle services (Bluetooth daemon, remote desktop, ModemManager, ABRT, PackageKit, Tracker indexers, auto-update timers…) purged; animations off; tuned swap/cache + BBR networking.
 - **Devops workbench** — Bluefin DX base: VS Code, rootless Docker + podman, Homebrew. On top: `podman.socket`, `podman-compose`, `buildah`, `skopeo`, `gh`, `git-lfs`, `yq`, `bat`, `eza`, `duf`, `fzf`, `ripgrep`, `fd-find`, `nodejs`/`npm`/`python3-pip`. Nix works too.
 - **KVM virtualization** — libvirt, `virt-manager` and VM tooling ready to go.
 - **Gaming ready** — Steam (Bluefin builds), **GameMode**, **Gamescope**, **Mangohud** (32-bit included), Vulkan tools.
