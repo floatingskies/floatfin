@@ -11,3 +11,6 @@ modules:
         - fastfetch
         - clinfo
         - firefox
+        # Remote admin: sshd.service is enabled in ublue-bluefin-overrides,
+        # so the server must already be present when that runs.
+        - openssh-server

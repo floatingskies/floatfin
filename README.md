@@ -1,93 +1,49 @@
 # floatfin &nbsp; [![bluebuild build badge](https://github.com/floatingskies/floatfin/actions/workflows/build-daily.yml/badge.svg)](https://github.com/floatingskies/floatfin/actions/workflows/build-daily.yml)
 
-Custom bootable container images tailored for production systems, workstations, and gaming. Built on top of **Bluefin DX** and **Bazzite (GNOME)** using **BlueBuild** tooling. All configurations are baked into the image layers at build time, including a regenerated initramfs to ensure branding persists from initial boot.
+Immutable, signed, bootable-container desktop images tuned for **sysadmin / devops work and gaming**. Built on [Bluefin DX](https://projectbluefin.io) and [Bazzite (GNOME)](https://bazzite.gg) with [BlueBuild](https://blue-build.org); every tweak is baked in at build time.
 
----
+## Why you'd retire for this
 
-## Features & Enhancements
+- **A real admin console out of the box** — [Cockpit](https://cockpit-project.org) (system/storage/network/containers web UI) enabled on boot at `https://<host>:9090`, `sshd` enabled, and a full CLI battery: `ansible-core`, `tmux`, `btop`, `htop`, `iotop`, `ncdu`, `lsof`, `psmisc`, `strace`, `nmap`, `tcpdump`, `rsync`, `sysstat`, `iperf3`, `mtr`, `smartctl`…
+- **Performance-tuned GNOME** — idle RAM ~900 MB–1 GB. Bloatware and ~20 idle services (Bluetooth daemon, ModemManager, ABRT, PackageKit, Tracker indexers, auto-update timers…) purged; animations off; tuned swap/cache + BBR networking.
+- **Devops workbench** — Bluefin DX base: VS Code, rootless Docker + podman, Homebrew. On top: `podman.socket`, `podman-compose`, `buildah`, `skopeo`, `gh`, `git-lfs`, `yq`, `bat`, `eza`, `duf`, `fzf`, `ripgrep`, `fd-find`, `nodejs`/`npm`/`python3-pip`. Nix works too.
+- **KVM virtualization** — libvirt, `virt-manager` and VM tooling ready to go.
+- **Gaming ready** — Steam (Bluefin builds), **GameMode**, **Gamescope**, **Mangohud** (32-bit included), Vulkan tools.
+- **Flatpak-ready, zero flatpaks shipped** — Flathub works; nothing baked in. Dock shows only native apps.
 
-### Production & Corporate Stability
-* **GTS (Great Timber Stable)** edition available for enterprise deployments, server management, and production environments requiring maximum stability and predictable updates.
-
-### System Branding & Aesthetic
-* **Float Identity:** Custom *Floatfin* and *Floatite* identity integrated into Settings, installer branding, hostname, Plymouth boot splash, and GDM login screen.
-* **Default Wallpaper:** `firewatch-view02.jpg` from the built-in `floatfin` collection — the only wallpapers shipped (stock GNOME, Fedora, KDE/Plasma and other distro collections are purged at build time).
-* **Typography:** **Intel One Mono** set as the primary interface font (Adwaita Sans retained for documents).
-* **Terminal Experience:** Custom `fastfetch` and login greeting displaying system status alongside the `foxy.png` logo, replacing *uwelcome*.
-* **Appearance:** Dark mode enabled out of the box.
-
-### Desktop & Interface Tweaks
-* **Performance-First GNOME:** Bloatware apps (GNOME games, welcome tour, App Center) removed, background services (Bluetooth daemon, ModemManager, ABRT, printer browsing, tuned, Tracker file indexers, PackageKit) disabled, animations off, and tuned swap/cache settings — idle GNOME sits around **900 MB – 1 GB** of RAM.
-* **Window Controls:** Minimize and maximize buttons enabled.
-* **File Manager (Nautilus):** Single-click item opening, compact icon view, and directories sorted first across Nautilus and GTK file choosers.
-* **Input & Clock:** Touchpad tap-to-click enabled by default; 12-hour AM/PM clock display with weekday headers.
-
-### Applications & Tooling
-* **Browsing & Gaming:** Firefox installed as the default browser via RPM. Steam pre-installed from `negativo17` on Bluefin builds (native on Bazzite).
-* **Bluefin DX Base:** Retains VS Code, Docker/Podman support, and Homebrew. On the shell: **Caffeine**, the **AppIndicator** tray and the **system-monitor-next** applet stay active, while Universal Blue's Logo Menu, Blur My Shell and Dash-to-Dock are disabled, and the `Ctrl+Alt+T` terminal shortcut stays.
-* **Package ecosystem friendly:** Homebrew, Flathub/flatpak and Nix all work out of the box — the image just ships **no flatpaks** (or flatpak dock pins) by default.
-* **Baked-in DevOps & Sysadmin Suite:**
-  * **Automation & Dev:** `ansible-core`, `gh`, `git-lfs`, `jq`, `shellcheck`, `nodejs`, `npm`, `python3-pip`
-  * **Networking & Utilities:** `bind-utils`, `iperf3`, `mtr`, `net-tools`, `sshpass`, `whois`, `wget`
-  * **System Monitoring & CLI Utilities:** `btop`, `fd-find`, `fzf`, `htop`, `iotop`, `ncdu`, `pv`, `ripgrep`, `sysstat`, `tmux`, `tree`
-
----
-
-## Image Tags
-
-Container images are hosted on the GitHub Container Registry (`ghcr.io`):
-
-| Image Tag | Base Stream | Update Schedule | Target Use Case |
-| :--- | :--- | :--- | :--- |
-| `ghcr.io/floatingskies/floatfin:gts` | Bluefin GTS (Great Timber Stable) | Weekly | Production machines & corporate environments |
-| `ghcr.io/floatingskies/floatfin:stable` | Bluefin Stable | Weekly | Standard desktop deployment |
-| `ghcr.io/floatingskies/floatfin:latest` | Bluefin Latest | Daily | Cutting-edge desktop features |
-| `ghcr.io/floatingskies/floatite:latest` | Bazzite DX (GNOME) | Daily | Gaming & handheld devices |
-
----
-
-## Installation
-
-### Switching from an Existing Installation
-From any existing Fedora Atomic Desktop (Silverblue, Kinoite, etc.) or Universal Blue variant:
+## Install (from any Fedora Atomic / Universal Blue image)
 
 ```bash
-sudo bootc switch ghcr.io/floatingskies/floatfin:gts --enforce-container-sigpolicy
+sudo bootc switch ghcr.io/floatingskies/floatfin:latest --enforce-container-sigpolicy
 systemctl reboot
 ```
 
-### Generating an ISO
-To build an offline installation ISO using Podman:
+## Images
+
+| Tag | Base | Schedule | Use |
+| :--- | :--- | :--- | :--- |
+| `floatfin:gts` | Bluefin GTS | weekly | production / enterprise |
+| `floatfin:stable` | Bluefin Stable | weekly | daily driver |
+| `floatfin:latest` | Bluefin Latest | daily | newest features |
+| `floatite:latest` | Bazzite DX GNOME | daily | gaming / handheld |
+
+## ISO & live desktop
+
+- **Live ISO:** trigger the **Build Live ISOs** workflow in Actions, boot the artifact, then run **Install to Disk**. Secure Boot supported.
+- **Offline ISO:** `./download-iso.sh floatfin gts` *(tag: `gts`, `stable` or `latest`)*
+
+## Day-1 commands
 
 ```bash
-./download-iso.sh floatfin gts
+ssh <host>                      # remote shell (openssh enabled)
+https://<host>:9090             # Cockpit admin web UI
+gamemoderun %command%           # per-game: GameMode CPU/I-O priority (Steam launch option)
+MANGOHUD=1 %command%            # per-game: enable the Mangohud overlay
 ```
-*(Options for tag name: `gts`, `stable`, or `latest`)*
 
-### Live ISO Images
-Live desktop ISOs are built using [Titanoboa](https://github.com/ublue-os/titanoboa). You can trigger the **Build Live ISOs** workflow via GitHub Actions (**Actions → Build Live ISOs**) and download the resulting `floatfin-gts-live-amd64.iso` artifact.
-
-Boot the live environment and launch **Install to Disk** (Anaconda) to write the image directly to storage.
-
----
-
-## Verification
-
-Images are cryptographically signed via [Cosign](https://github.com/sigstore/cosign). Verify image integrity using the public key from this repository:
+## Verify & build locally
 
 ```bash
 cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:gts
-cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:stable
-cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:latest
-cosign verify --key cosign.pub ghcr.io/floatingskies/floatite:latest
-```
-
----
-
-## Building Locally
-
-To trigger a local build using BlueBuild recipes:
-
-```bash
-./build-image.sh [recipe file]
+./build-image.sh [recipe]       # recipes live in recipes/ (floatfin-{latest,stable,gts}.yml, floatite.yml)
 ```
