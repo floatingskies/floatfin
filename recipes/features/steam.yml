@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/module-stage-list-v1.json
+
+# Steam client from negativo17. Bluefin does not ship it and
+# Bazzite already does, so this feature is only wired into the Bluefin images.
+modules:
+  - type: dnf
+    repos:
+      nonfree: negativo17
+    install:
+      packages:
+        - steam

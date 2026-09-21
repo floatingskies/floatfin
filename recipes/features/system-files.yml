@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/module-stage-list-v1.json
+modules:
+  - type: signing
+  - type: files
+    files:
+      - source: system
+        destination: /
+  - type: script
+    # Rewrite /usr/lib/os-release with Float branding
+    # (flavor is auto-detected from the base image).
+    scripts:
+      - set-os-release.sh
+      - disable-ublue-motd.sh

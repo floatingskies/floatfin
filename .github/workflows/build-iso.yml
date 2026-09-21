@@ -1,0 +1,167 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build Live ISOs
+
+on:
+  workflow_dispatch:
+
+env:
+  REPO_OWNER: ${{ github.repository_owner }}
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-iso
+  cancel-in-progress: true
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: floatfin
+            tag: stable
+            label: Floatfin-Live
+    steps:
+      - name: Free Disk Space (Ubuntu)
+        uses: jlumbroso/free-disk-space@54081f138730dfa15788a46383842cd2f914a1be # v1.3.1
+        with:
+          tool-cache: true
+
+      - name: Mount Container Storage BTRFS Loopback
+        run: |
+          sudo truncate -s 110G /mnt/podman-storage.img
+          sudo mkfs.btrfs -f -m single -d single /mnt/podman-storage.img
+          sudo podman system reset --force
+          sudo systemctl stop podman.service
+          LOOP=$(sudo losetup --find --show --direct-io=on /mnt/podman-storage.img)
+          sudo mkdir -p /mnt/podman-storage
+          sudo mount -o compress-force=zstd:2,discard=async,noatime "$LOOP" /mnt/podman-storage
+          sudo mkdir -p /mnt/podman-storage/storage /mnt/podman-storage/tmp
+          sudo mount --bind /mnt/podman-storage/storage /var/lib/containers/storage
+          sudo systemctl start podman.service
+
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # The image registry name must be lower-case, but GitHub usernames can be capitalized.
+      - name: Get lower-case equivalent of the repository owner's username
+        id: repo_owner_case
+        run: echo "lowercase=${REPO_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Container Image
+        run: |
+          IMAGE="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/${{ matrix.name }}:${{ matrix.tag }}"
+          CACHE_REPO="ghcr.io/${{ steps.repo_owner_case.outputs.lowercase }}/floatfin-iso-cache-${{ matrix.name }}"
+          echo "${{ github.token }}" | sudo podman login ghcr.io -u "${{ github.actor }}" --password-stdin
+          # note: buildah's cache flags take a bare repository reference (no
+          # tag/digest and no BuildKit "type=registry,ref=...,mode=max" syntax),
+          # so keep each matrix row's cache in its own repo name
+          sudo env TMPDIR=/mnt/podman-storage/tmp podman build \
+            --cap-add sys_admin \
+            --security-opt label=disable \
+            --cache-from "$CACHE_REPO" \
+            --cache-to "$CACHE_REPO" \
+            --build-arg BASE_IMAGE="$IMAGE" \
+            --build-arg INSTALL_IMAGE_PAYLOAD="$IMAGE" \
+            --build-arg ISO_LABEL="${{ matrix.label }}" \
+            -t localhost/payload:latest installer/
+
+      - name: Show disk space
+        if: always()
+        run: |
+          sudo df -h
+          sudo du -sh /mnt/podman-storage.img
+
+      - name: Build ISOs
+        # Pin to the exact revamp-pr commit (7737f47) for reproducible ISO
+        # builds instead of following the moving branch.
+        uses: Zeglius/titanoboa@7737f4748458252ac827dca14b3d6dd09298472a
+        id: build
+        with:
+          image-ref: localhost/payload:latest
+          iso-dest: ${{ matrix.name }}-${{ matrix.tag }}-live-amd64.iso
+
+      - name: Move ISOs to Upload Directory
+        id: upload-directory
+        shell: bash
+        run: |
+          ISO_UPLOAD_DIR=${{ github.workspace }}/upload
+          ISO_PATH=${{ steps.build.outputs.iso-dest }}
+          ISO_NAME=$(basename ${ISO_PATH})
+
+          mkdir -p ${ISO_UPLOAD_DIR}
+          mv ${ISO_PATH} ${ISO_UPLOAD_DIR}
+          (cd ${ISO_UPLOAD_DIR} && sha256sum ${ISO_NAME} | tee ${ISO_NAME}-CHECKSUM)
+          echo "iso-upload-dir=${ISO_UPLOAD_DIR}" >> $GITHUB_OUTPUT
+
+      - name: Upload ISOs and Checksum to Job Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-${{ matrix.tag }}-live
+          path: ${{ github.workspace }}/upload
+          if-no-files-found: error
+          retention-days: 7
+          compression-level: 0
+          overwrite: true
+
+  publish-release:
+    name: Publish Latest ISO Release
+    runs-on: ubuntu-latest
+    needs: build-iso
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Publish the freshly built ISOs as a public GitHub Release so the
+      # website (and anyone else) can download them without authentication.
+      # Workflow artifacts are private; release assets are public.
+      - name: Download ISO Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: isos
+          merge-multiple: true
+
+      - name: Generate Release Body
+        shell: bash
+        run: |
+          REPO="${{ github.repository }}"
+          {
+            echo "Live desktop ISOs built automatically from the \`main\` branch."
+            echo
+            echo "Each ISO boots into the full desktop from the image and can install it to disk with the on-screen **Install to Disk** (Anaconda) launcher. Secure Boot is supported via the Universal Blue enrollment key."
+            echo
+            echo "## What changed since the previous ISO"
+            PREV=$(gh release view iso-latest --json tagName -q '.tagName' 2>/dev/null || true)
+            if [[ -n "$PREV" ]]; then
+              gh api "repos/$REPO/compare/$PREV...main" \
+                --jq '.commits[] | "- " + (.commit.message | split("\n")[0])'
+            else
+              echo "- First ISO release for this repository."
+            fi
+          } > release-body.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Publish / Update ISO Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: iso-latest
+          name: Float Live ISO (latest)
+          make_latest: true
+          overwrite: true
+          fail_on_unmatched_files: true
+          body_path: release-body.md
+          files: |
+            isos/*.iso
+            isos/*-CHECKSUM

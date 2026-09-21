@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://schema.blue-build.org/module-stage-list-v1.json
+# Dev-ops / sysadmin / web-dev / Linux-enthusiast CLI toolkit. Everything here
+# is available in the stock Fedora repos, so the image keeps working across
+# repo and Fedora version bumps with no third-party repos to babysit.
+modules:
+  - type: dnf
+    install:
+      packages:
+        # dev-ops & automation
+        - ansible-core
+        - gh
+        - git-lfs
+        - jq
+        - shellcheck
+        - sshpass
+        # sysadmin / diagnostics
+        - bind-utils
+        - htop
+        - iotop
+        - iperf3
+        - mtr
+        - ncdu
+        - net-tools
+        - sysstat
+        - tmux
+        - tree
+        - whois
+        - wget
+        # terminal-power-user essentials
+        - btop
+        - chafa
+        - ImageMagick-libs
+        - fd-find
+        - fzf
+        - pv
+        - ripgrep
+        # web development
+        - nodejs
+        - npm
+        - python3-pip

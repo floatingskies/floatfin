@@ -1,0 +1,17 @@
+# run with --cap-add sys_admin --security-opt label=disable
+
+ARG BASE_IMAGE=${BASE_IMAGE:-ghcr.io/floatingskies/floatfin:stable}
+ARG INSTALL_IMAGE_PAYLOAD=${INSTALL_IMAGE_PAYLOAD:-ghcr.io/floatingskies/floatfin:stable}
+ARG ISO_LABEL=${ISO_LABEL:-Floatfin-Live}
+
+
+FROM $BASE_IMAGE
+ARG BASE_IMAGE
+ARG INSTALL_IMAGE_PAYLOAD
+ARG ISO_LABEL
+RUN --mount=type=bind,source=./.,target=/src \
+    env \
+    BASE_IMAGE="$BASE_IMAGE" \
+    INSTALL_IMAGE_PAYLOAD="$INSTALL_IMAGE_PAYLOAD" \
+    ISO_LABEL="$ISO_LABEL" \
+    /src/build.sh
