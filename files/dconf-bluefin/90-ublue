@@ -17,7 +17,7 @@ clock-format='12h'
 clock-show-weekday=true
 color-scheme='prefer-dark'
 show-battery-percentage=true
-monospace-font-name='Intel One Mono 14'
+monospace-font-name='Fira Code 12'
 
 [org/gtk/Settings/FileChooser]
 sort-directories-first=true

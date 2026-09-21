@@ -33,6 +33,10 @@ systemctl reboot
 | `floatfin:stable` | Bluefin Stable | weekly | daily driver |
 | `floatfin:latest` | Bluefin Latest | daily | newest features |
 | `floatite:latest` | Bazzite DX GNOME | daily | gaming / handheld |
+| `floatfin-silverblue:gts` | **Silverblue 43** | weekly | backup edition |
+| `floatfin-silverblue:latest` (also `stable`) | **Silverblue 44** | daily | backup edition |
+
+The **Silverblue backup editions** are insurance: the exact same Floatfin customizations (terminal-first tools, `float` wizard, Nix, distrobox, dock, cockpit/SSH/podman sockets, fox branding) baked onto **stock Fedora Silverblue**, always one Fedora release behind Bluefin — no Universal Blue base involved. If Bluefin ever disappears, run `sudo bootc switch ghcr.io/floatingskies/floatfin-silverblue:latest` and nothing changes.
 
 ## ISO & live desktop
 
@@ -57,5 +61,5 @@ MANGOHUD=1 %command%            # per-game: enable the Mangohud overlay
 
 ```bash
 cosign verify --key cosign.pub ghcr.io/floatingskies/floatfin:gts
-./build-image.sh [recipe]       # recipes live in recipes/ (floatfin-{latest,stable,gts}.yml, floatite.yml)
+./build-image.sh [recipe]       # recipes live in recipes/ (floatfin-{latest,stable,gts}.yml, floatite.yml, floatfin-silverblue{-gts}.yml)
 ```
