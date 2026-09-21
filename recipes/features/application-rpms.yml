@@ -17,14 +17,9 @@ modules:
         # Remote admin: sshd.socket is enabled in ublue-bluefin-overrides,
         # so the server must already be present when that runs.
         - openssh-server
-  # VLC from negativo17's multimedia repo: fully-featured build matching the
-  # other negativo17 packages (Steam/gaming) already in the image.
+  # VLC: the Bluefin base already ships negativo17's fedora-multimedia repo
+  # (used for its codecs), so we only need to install the package.
   - type: dnf
-    repos:
-      files:
-        - https://negativo17.org/repos/fedora-multimedia.repo
-      keys:
-        - https://negativo17.org/repos/RPM-GPG-KEY-slaanesh
     install:
       skip-unavailable: true
       packages:
