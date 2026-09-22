@@ -17,6 +17,10 @@ image-version: 43
 # module configuration, executed in order
 # you can include multiple instances of the same module
 modules:
+  - type: files  # Pre-seed the ublue-os COPR repos (stock Silverblue has none)
+    files:
+      - source: repos
+        destination: /etc/yum.repos.d
   - from-file: features/system-files.yml
   - from-file: features/application-rpms.yml
   - from-file: features/vscode.yml

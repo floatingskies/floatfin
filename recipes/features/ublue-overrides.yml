@@ -5,10 +5,8 @@ modules:
     - source: dconf-ublue
       destination: /etc/dconf/db/distro.d
 - type: dnf
-  repos:
-    files:
-      - ublue-os-staging.repo
-      - ublue-os-packages.repo
+  # ublue-os/staging + ublue-os/packages COPRs are pre-seeded by the image
+  # (files/repos/*.repo on Silverblue, the base on Bluefin); never re-add.
   install:
     packages:
       # These are generally packages from Bluefin (DX)
