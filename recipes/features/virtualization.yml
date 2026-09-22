@@ -6,7 +6,11 @@ modules:
     # repo before this module runs). Adding it dynamically is fragile —
     # COPR chroot detection breaks on floatfin os-release and a duplicate
     # repo id hard-fails the Bluefin builds.
+    # skip-unavailable: on Bluefin the libvirt stack is already baked in and
+    # ublue-os-libvirt-workarounds may not resolve at build time; on Silverblue
+    # everything installs for real. Skipping keeps both happy.
     install:
+      skip-unavailable: true
       packages:
         - libvirt
         - libvirt-nss
