@@ -10,10 +10,13 @@ There's nothing to install to get started. A couple of things you'll want:
   • Open the terminal ........ Super, type "terminal", or press Ctrl+Alt+T
   • First update ............. sudo bootc upgrade && systemctl reboot
                                  (your whole OS updates atomically — like a phone)
-  • Install software ......... three ways, pick your favourite:
-      - Flatpak/GNOME Software .. most GUI apps, sandboxed:        flatpak install flathub <app>
-      - dnf native RPMs ......... system packages:                 sudo dnf install <pkg>
-      - distrobox ............... any other distro's packages:      distrobox enter fedora
+  • Install software ......... three ways, all happy on an image-only system:
+      - Flatpak/GNOME Software .. most GUI apps, sandboxed:    flatpak install flathub <app>
+      - Nix ..................... any package, no root needed: nix profile install nixpkgs#<pkg>
+      - distrobox ............... any other distro's packages:  distrobox enter fedora
+                                  (dnf/apt/pacman live *inside* the box, never on the host)
+      There is no `dnf` here: the OS is a never-edited image. System packages only
+      change when you rebase to a new floatfin built with them — never by layering.
   • Still lost? ................ run `gnome-tour` for the interactive intro.
 
   Tip: `float` from any terminal re-opens this menu.
@@ -50,5 +53,8 @@ The immutable core, driven from the terminal:
   • Firewall .............................. sudo firewall-cmd --list-all
   • Cockpit console ........................ systemctl status cockpit   →  https://localhost:9090
   • Nix store + daemon ..................... systemctl status nix-daemon;  nix doctor
+  • Software that lives in dnf/Apt worlds .. distrobox enter fedora    (dnf only exists in there)
 
   Everything under /usr is read-only by design; use the store/layers, not hacks.
+  Permanent system changes ride along with images: `bootc switch` your own
+  floatfin build rather than rpm-ostree layering.
