@@ -5,17 +5,27 @@ set -euo pipefail
 #
 #  - Flakes + nice defaults on for everyone via /etc/nix/nix.conf
 #    (sandbox off: Nix's build sandbox misbehaves on immutable roots).
-#  - Start the multi-user daemon. Prefer the socket-activated unit (zero idle
-#    RAM, spawns only on first nix command) with a guarded fallback to the
-#    always-on service, so this survives Fedora packaging changes.
+#  - Start the multi-user daemon as an always-on service (see below: socket
+#    activation is blocked by SELinux on the immutable root).
 
 # --- Enable the Nix daemon (guarded so a missing unit can't fail the build) --
-if systemctl list-unit-files nix-daemon.socket >/dev/null 2>&1; then
-    echo "Enabling nix-daemon.socket (socket-activated daemon)"
+#
+# Prefer the always-on service over socket activation: with SELinux enforcing
+# (Fedora default) systemd cannot bind /nix/var/nix/daemon-socket/socket —
+# there is no policy allowing systemd to create that socket under /nix, so the
+# socket unit dies with EACCES ("Permission denied"). The nix-daemon process
+# itself *can* bind its own socket in its own domain, which is why the plain
+# service works on Fedora Atomic images.
+if systemctl list-unit-files nix-daemon.service >/dev/null 2>&1; then
+    echo "Enabling nix-daemon.service (always-on daemon, binds its own socket)"
+    systemctl disable nix-daemon.socket 2>/dev/null || true
+    systemctl enable nix-daemon.service
+elif systemctl list-unit-files nix-daemon.socket >/dev/null 2>&1; then
+    # Fallback: only the socket exists (non-Fedora packaging or future rpm
+    # change). Socket activation on the immutable root is blocked by SELinux,
+    # but keep the enable so at least the unit is wired up.
+    echo "Enabling nix-daemon.socket (socket-activated daemon; SELinux may block the bind)"
     systemctl enable nix-daemon.socket 2>/dev/null || true
-elif systemctl list-unit-files nix-daemon.service >/dev/null 2>&1; then
-    echo "Enabling nix-daemon.service"
-    systemctl enable nix-daemon.service 2>/dev/null || true
 else
     echo "nix-daemon unit not present; skipping daemon integration" >&2
 fi

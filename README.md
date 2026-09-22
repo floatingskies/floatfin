@@ -51,9 +51,10 @@ ssh <host>                      # remote shell (openssh socket-activated)
 https://<host>:9090             # Cockpit admin web UI
 distrobox enter fedora          # drop into a full Fedora container, share ~
 distrobox enter ubuntu -- bash  # ...or any other distro
-nix run nixpkgs#hello           # first Nix command (spins up the daemon on demand)
+nix run nixpkgs#hello           # first Nix command (multi-user daemon is already running)
 nix develop nixpkgs#python3     # drop into a Python shell from nixpkgs
 # Nix store lives on persistent /var: the immutable root bind-mounts /var/lib/nix onto /nix at boot.
+# The daemon runs as an always-on service (socket activation is blocked by SELinux on immutable roots).
 gamemoderun %command%           # per-game: GameMode CPU/I-O priority (Steam launch option)
 MANGOHUD=1 %command%            # per-game: enable the Mangohud overlay
 ```
