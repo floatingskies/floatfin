@@ -2,8 +2,8 @@
 modules: 
   - type: dnf
     repos:
-      copr:
-        - ublue-os/packages
+      files:
+        - ublue-os-packages.repo
     install:
       packages:
         - libvirt

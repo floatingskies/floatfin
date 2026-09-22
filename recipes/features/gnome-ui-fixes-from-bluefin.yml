@@ -4,9 +4,9 @@
 modules:
   - type: dnf
     repos:
-      copr:
-        - ublue-os/staging
-        - ublue-os/packages
+      files:
+        - ublue-os-staging.repo
+        - ublue-os-packages.repo
     install:
       packages:    
         - gnome-shell-extension-appindicator
