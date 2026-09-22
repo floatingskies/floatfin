@@ -20,6 +20,19 @@ else
     echo "nix-daemon unit not present; skipping daemon integration" >&2
 fi
 
+# --- Writable store on an immutable root --------------------------------------
+# Fedora Atomic roots are read-only at boot, so the baked-in /nix directory
+# can't hold a live store. floatfin-nix.mount binds persistent /var/lib/nix
+# over /nix (backing dir created at boot by tmpfiles.d/floatfin-nix.conf).
+# Without this, the first nix command dies with
+# "/nix/store/.links: Read-only file system".
+if systemctl list-unit-files floatfin-nix.mount >/dev/null 2>&1; then
+    echo "Enabling floatfin-nix.mount (bind /var/lib/nix over /nix)"
+    systemctl enable floatfin-nix.mount
+else
+    echo "floatfin-nix.mount not present; skipping writable-store integration" >&2
+fi
+
 # --- Flakes on, and keep the daemon honest -----------------------------------
 # Merge into any config the package ships: single idempotent block guarded by a
 # marker so rebuilds don't duplicate it.
